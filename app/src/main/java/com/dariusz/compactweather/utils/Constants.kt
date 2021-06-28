@@ -9,4 +9,6 @@ object Constants {
     //DB SETUP
     const val DB_NAME = "compact_weather_db"
     const val DB_VERSION = 1
+
+    const val CITY_KEY_FOR_TESTS = 273125
 }

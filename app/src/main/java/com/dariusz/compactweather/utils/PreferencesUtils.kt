@@ -15,7 +15,7 @@ class PreferencesUtils(private val context: Context) {
 
     private val KEY_PREF = intPreferencesKey("key")
 
-    suspend fun insertNewKeyIntoDataStore(newKey: Int){
+    suspend fun insertNewKeyIntoDataStore(newKey: Int) {
         context._dataStore.edit { settings ->
             settings[KEY_PREF] = newKey
         }

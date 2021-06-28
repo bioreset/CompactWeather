@@ -1,7 +1,10 @@
 package com.dariusz.compactweather.data.source.remote.api
 
 import com.dariusz.compactweather.di.NetworkModule.provideRetrofit
-import com.dariusz.compactweather.model.*
+import com.dariusz.compactweather.domain.model.AutoComplete
+import com.dariusz.compactweather.domain.model.CurrentConditionsJson
+import com.dariusz.compactweather.domain.model.DailyForecastResponse
+import com.dariusz.compactweather.domain.model.HourlyForecastJson
 
 class CompactWeatherApiServiceImpl : CompactWeatherApiService {
 
@@ -10,10 +13,10 @@ class CompactWeatherApiServiceImpl : CompactWeatherApiService {
     override suspend fun getAutoComplete(q: String): List<AutoComplete> =
         retrofit.getAutoComplete(q)
 
-    override suspend fun getCurrentWeather(key: String): CurrentConditions =
+    override suspend fun getCurrentWeather(key: String): CurrentConditionsJson =
         retrofit.getCurrentWeather(key)
 
-    override suspend fun getTwelveFourHourForecast(key: String): List<HourlyForecast> =
+    override suspend fun getTwelveFourHourForecast(key: String): List<HourlyForecastJson> =
         retrofit.getTwelveFourHourForecast(key)
 
     override suspend fun getFiveDayForecast(key: String): DailyForecastResponse =

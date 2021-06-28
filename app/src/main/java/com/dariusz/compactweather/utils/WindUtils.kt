@@ -2,7 +2,7 @@ package com.dariusz.compactweather.utils
 
 object WindUtils {
 
-    fun windDirection(degrees: Int) : String{
+    fun windDirection(degrees: Int): String {
         return when (degrees) {
             in 0..23 -> "N"
             in 24..67 -> "NE"

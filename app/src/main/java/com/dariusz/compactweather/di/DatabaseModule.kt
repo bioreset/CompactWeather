@@ -2,19 +2,19 @@ package com.dariusz.compactweather.di
 
 import android.content.Context
 import androidx.room.Room
-import com.dariusz.compactweather.data.source.local.db.dao.CurrentConditionsDao
-import com.dariusz.compactweather.data.source.local.db.dao.DailyForecastDao
-import com.dariusz.compactweather.data.source.local.db.dao.HourlyForecastDao
-import com.dariusz.compactweather.data.source.local.db.init.CompactWeatherDB
+import com.dariusz.compactweather.data.local.db.dao.CurrentConditionsDao
+import com.dariusz.compactweather.data.local.db.dao.DailyForecastDao
+import com.dariusz.compactweather.data.local.db.dao.HourlyForecastDao
+import com.dariusz.compactweather.data.local.db.init.CompactWeatherDB
 import com.dariusz.compactweather.utils.Constants.DB_NAME
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Singleton
 
 @Module
-@InstallIn(Singleton::class)
+@InstallIn(ViewComponent::class)
 object DatabaseModule {
 
     @Provides
