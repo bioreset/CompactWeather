@@ -9,36 +9,84 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.dariusz.compactweather.domain.model.DailyForecastJson
-import com.dariusz.compactweather.domain.model.HourlyForecastJson
+import com.dariusz.compactweather.domain.model.DailyForecast
+import com.dariusz.compactweather.domain.model.HourlyForecast
+import com.dariusz.compactweather.presentation.theme.ThemeTypography
+import com.dariusz.compactweather.presentation.theme.getTypography
 
 @Composable
-fun ScrollableHourlyForecast(hourlyForecastJson: List<HourlyForecastJson>) {
+fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
     LazyRow(modifier = Modifier.fillMaxWidth()) {
-        items(hourlyForecastJson) { item ->
+        items(hourlyForecast) { item ->
             Card(
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.padding(16.dp)
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.padding(12.dp)
             ) {
                 Text(
-                    "Timestamp: " + item.dateTime,
-                    modifier = Modifier.padding(16.dp),
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 20.sp
-                    )
+                    "Weather Condition: " + item.weatherCondition,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
                 )
                 Text(
-                    "Weather condition: " + item.weatherCondition,
-                    modifier = Modifier.padding(16.dp),
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 20.sp
-                    )
+                    "Temperature: " + item.temperature,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Real Feel Temp: " + item.realFeelTemperature,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Humidity: " + item.humidity,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Wind: " + item.windV2,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Humidity: " + item.humidity,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Rain probability: " + item.rainProbability,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Snow probability: " + item.snowProbability,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Rain: " + item.rain,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Snow: " + item.snow,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Cloud cover: " + item.cloudCover,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Link: " + item.mobileLink,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Updates as of: " + item.dateTime,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
                 )
             }
         }
@@ -46,28 +94,57 @@ fun ScrollableHourlyForecast(hourlyForecastJson: List<HourlyForecastJson>) {
 }
 
 @Composable
-fun ScrollableDailyForecast(hourlyForecastJson: List<DailyForecastJson>) {
+fun ScrollableDailyForecast(dailyForecast: List<DailyForecast>) {
     LazyRow(modifier = Modifier.fillMaxWidth()) {
-        items(hourlyForecastJson) { item ->
+        items(dailyForecast) { item ->
             Card(
-                shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.padding(16.dp)
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.padding(12.dp)
             ) {
                 Text(
-                    "Timestamp: " + item.dateTime,
-                    modifier = Modifier.padding(16.dp),
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 20.sp
-                    )
+                    "Sun: " + item.sun,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
                 )
                 Text(
-                    "Min. temp: " + item.temperature.minimum.value.toString() + " C",
-                    modifier = Modifier.padding(16.dp),
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 20.sp
-                    )
+                    "Moon" + item.moon,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Temperature" + item.temperature,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Real Feel Temp: " + item.realFeelTemperature,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Hours of sun: " + item.hoursOfSun,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Day: " + item.dayJson,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Night: " + item.nightJson,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Mobile Link: " + item.dateTime,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
+                )
+                Text(
+                    "Updated as of: " + item.dateTime,
+                    modifier = Modifier.padding(12.dp),
+                    style = ThemeTypography.Main.getTypography().body1
                 )
             }
         }

@@ -1,6 +1,6 @@
 package com.dariusz.compactweather.domain.model
 
-data class NetworkState (
+data class NetworkState(
     val permissionState: Boolean? = false,
     val connectivityState: Boolean? = false
 ) {

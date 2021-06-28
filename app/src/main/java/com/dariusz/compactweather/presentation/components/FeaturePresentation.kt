@@ -8,6 +8,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.dariusz.compactweather.domain.model.CurrentConditions
+import com.dariusz.compactweather.presentation.theme.ThemeTypography
+import com.dariusz.compactweather.presentation.theme.getTypography
+
+@Composable
+fun CurrentConditions(input: CurrentConditions) {
+    Text(
+        text = "Current Conditions in your location: ",
+        style = ThemeTypography.Main.getTypography().h1
+    )
+    LeftRightText(left = "", right = input.datetime)
+    LeftRightText(left = "", right = input.weatherCondition)
+    LeftRightText(left = "", right = input.temperature)
+    LeftRightText(left = "", right = input.realFeelTemperature)
+    LeftRightText(left = "", right = input.humidity.toString())
+    LeftRightText(left = "", right = input.wind)
+    LeftRightText(left = "", right = input.cloudCover.toString())
+    LeftRightText(left = "", right = input.pressure)
+    Text(text = "Updates as of ${input.datetime}")
+}
+
 
 @Composable
 fun LeftRightText(left: String, right: String) {
