@@ -18,7 +18,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 object DatabaseModule {
 
     @Provides
-    fun buildDatabase(@ApplicationContext context: Context): CompactWeatherDB {
+    private fun buildDatabase(@ApplicationContext context: Context): CompactWeatherDB {
         return Room.databaseBuilder(context, CompactWeatherDB::class.java, DB_NAME)
             .fallbackToDestructiveMigration()
             .build()

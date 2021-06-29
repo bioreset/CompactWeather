@@ -5,9 +5,12 @@ import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiServic
 import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.domain.model.HourlyForecast
 import com.dariusz.compactweather.domain.model.HourlyForecast.Companion.hourlyForecastsToDB
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 class HourlyForecastRepository
@@ -27,18 +30,20 @@ class HourlyForecastRepository
                         hourlyForecast
                     )
                 )
+                val hourlyForecastFromDB = hourlyForecastDao.getAllHourlyForecasts()
                 delay(500)
                 emit(
                     DataState.Success(
-                        hourlyForecastsToDB(
-                            hourlyForecast
-                        )
+                        hourlyForecastFromDB
                     )
                 )
 
             } catch (exception: Exception) {
                 emit(DataState.Error(exception))
             }
-        }
-
+        }.shareIn(
+            MainScope(),
+            SharingStarted.WhileSubscribed(),
+            1
+        )
 }

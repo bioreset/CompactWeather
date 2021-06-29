@@ -16,7 +16,7 @@ data class DailyForecastJson(
     @field:Json(name = "RealFeelTemperature")
     val realFeelTemperature: RealFeelTemperatureV2,
     @field:Json(name = "HoursOfSun")
-    val hoursOfSun: Int,
+    val hoursOfSun: Double,
     @field:Json(name = "Day")
     val dayJson: DayJson,
     @field:Json(name = "Night")

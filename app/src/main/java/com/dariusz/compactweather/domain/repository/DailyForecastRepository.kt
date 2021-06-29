@@ -4,8 +4,11 @@ import com.dariusz.compactweather.data.local.db.dao.DailyForecastDao
 import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiService
 import com.dariusz.compactweather.domain.model.DailyForecast.Companion.dailyForecastsToDB
 import com.dariusz.compactweather.domain.model.DataState
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 class DailyForecastRepository
@@ -24,17 +27,19 @@ class DailyForecastRepository
                     dailyForecast
                 )
             )
+            val dailyForecastFromDB = dailyForecastDao.getAllDailyForecasts()
             delay(500)
             emit(
                 DataState.Success(
-                    dailyForecastsToDB(
-                        dailyForecast
-                    )
+                    dailyForecastFromDB
                 )
             )
         } catch (exception: Exception) {
             emit(DataState.Error(exception))
         }
-    }
-
+    }.shareIn(
+        MainScope(),
+        SharingStarted.WhileSubscribed(),
+        1
+    )
 }

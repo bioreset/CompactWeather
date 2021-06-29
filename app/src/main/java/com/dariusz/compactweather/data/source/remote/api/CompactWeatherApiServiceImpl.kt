@@ -10,9 +10,6 @@ class CompactWeatherApiServiceImpl : CompactWeatherApiService {
 
     private val retrofit = provideRetrofit()
 
-    override suspend fun getAutoComplete(q: String): List<AutoComplete> =
-        retrofit.getAutoComplete(q)
-
     override suspend fun getCurrentWeather(key: String): CurrentConditionsJson =
         retrofit.getCurrentWeather(key)
 

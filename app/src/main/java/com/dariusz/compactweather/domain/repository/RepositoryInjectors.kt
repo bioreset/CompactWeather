@@ -8,10 +8,6 @@ import com.dariusz.compactweather.di.NetworkModule.provideRetrofitService
 
 object RepositoryInjectors {
 
-    fun getAutoCompleteRepository(): AutoCompleteRepository =
-        AutoCompleteRepository(
-            provideRetrofitService()
-        )
 
     fun getCurrentConditionsRepository(context: Context): CurrentConditionsRepository =
         CurrentConditionsRepository(

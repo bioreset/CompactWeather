@@ -9,8 +9,6 @@ import androidx.navigation.compose.composable
 import com.dariusz.compactweather.presentation.screens.detail.DetailScreen
 import com.dariusz.compactweather.presentation.screens.home.HomeScreen
 import com.dariusz.compactweather.presentation.screens.home.HomeScreenViewModel
-import com.dariusz.compactweather.presentation.screens.settings.SettingsScreen
-import com.dariusz.compactweather.presentation.screens.settings.SettingsScreenViewModel
 import com.dariusz.compactweather.presentation.screens.splash.SplashScreen
 import com.dariusz.compactweather.presentation.screens.splash.SplashScreenViewModel
 
@@ -30,10 +28,6 @@ fun MainNavigationHost(navController: NavController) {
         }
         composable(Screens.AppScreens.DetailsScreen.route) {
             DetailScreen()
-        }
-        composable(Screens.AppScreens.SettingsScreen.route) {
-            val viewModel: SettingsScreenViewModel = viewModel()
-            SettingsScreen(viewModel)
         }
     }
 }

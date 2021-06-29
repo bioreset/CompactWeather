@@ -8,7 +8,7 @@ import com.squareup.moshi.JsonClass
 data class Rain(
     @field:Json(name = "Value")
     @ColumnInfo(name = "rainvalue")
-    val value: Int,
+    val value: Double,
     @field:Json(name = "Unit")
     @ColumnInfo(name = "rainunit")
     val unit: String
@@ -18,7 +18,7 @@ data class Rain(
 data class Snow(
     @field:Json(name = "Value")
     @ColumnInfo(name = "snowvalue")
-    val value: Int,
+    val value: Double,
     @field:Json(name = "Unit")
     @ColumnInfo(name = "snowunit")
     val unit: String

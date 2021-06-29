@@ -1,6 +1,5 @@
 package com.dariusz.compactweather.data.source.remote.api
 
-import com.dariusz.compactweather.domain.model.AutoComplete
 import com.dariusz.compactweather.domain.model.CurrentConditionsJson
 import com.dariusz.compactweather.domain.model.DailyForecastResponse
 import com.dariusz.compactweather.domain.model.HourlyForecastJson
@@ -10,13 +9,6 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CompactWeatherApi {
-
-    @GET("/locations/v1/cities/autocomplete?")
-    suspend fun getAutoComplete(
-        @Query("q") q: String,
-        @Query("apikey") apiKey: String = API_KEY
-    ): List<AutoComplete>
-
 
     @GET("currentconditions/v1/{locationkey}")
     suspend fun getCurrentWeather(

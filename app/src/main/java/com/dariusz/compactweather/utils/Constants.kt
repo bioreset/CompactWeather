@@ -3,8 +3,8 @@ package com.dariusz.compactweather.utils
 object Constants {
 
     //API SETUP
-    const val API_URL = "http://dataservice.accuweather.com/"
-    const val API_KEY = "fj7C6S1DCVtYvyWBSIGKrBCvBELCc3Tj"
+    const val API_URL = "https://dataservice.accuweather.com/"
+    const val API_KEY = "API_KEY"
 
     //DB SETUP
     const val DB_NAME = "compact_weather_db"
