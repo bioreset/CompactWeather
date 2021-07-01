@@ -1,5 +1,5 @@
 package com.dariusz.compactweather.domain.model
 
-data class NetworkState(
+data class PermissionsState(
     val state: Boolean? = false
 )

@@ -1,4 +1,4 @@
-package com.dariusz.compactweather.presentation.theme
+package com.dariusz.compactweather.presentation.components.theme
 
 import androidx.compose.runtime.saveable.Saver
 import com.dariusz.compactweather.domain.model.AppTheme

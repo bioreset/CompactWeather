@@ -1,8 +1,8 @@
 package com.dariusz.compactweather.domain.model
 
-import com.dariusz.compactweather.presentation.theme.ThemeColor
-import com.dariusz.compactweather.presentation.theme.ThemeShapesFamily
-import com.dariusz.compactweather.presentation.theme.ThemeTypography
+import com.dariusz.compactweather.presentation.components.theme.ThemeColor
+import com.dariusz.compactweather.presentation.components.theme.ThemeShapesFamily
+import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
 
 data class AppTheme(
     val primaryColor: ThemeColor = ThemeColor.Blue,

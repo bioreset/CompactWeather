@@ -1,41 +1,51 @@
 package com.dariusz.compactweather.di
 
 import android.content.Context
+import com.dariusz.compactweather.di.DatabaseModule.provideCurrentConditionsDAO
+import com.dariusz.compactweather.di.DatabaseModule.provideDailyForecastDAO
+import com.dariusz.compactweather.di.DatabaseModule.provideHourlyForecastDAO
+import com.dariusz.compactweather.di.DatabaseModule.provideSavedCitiesDAO
+import com.dariusz.compactweather.di.NetworkModule.provideRetrofitService
 import com.dariusz.compactweather.domain.repository.CurrentConditionsRepository
 import com.dariusz.compactweather.domain.repository.DailyForecastRepository
 import com.dariusz.compactweather.domain.repository.HourlyForecastRepository
+import com.dariusz.compactweather.domain.repository.SavedCityRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.components.SingletonComponent
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
     @Provides
-    @ViewModelScoped
+    fun getSavedCityRepository(@ApplicationContext context: Context): SavedCityRepository =
+        SavedCityRepository(
+            provideRetrofitService(),
+            provideSavedCitiesDAO(context)
+        )
+
+
+    @Provides
     fun getCurrentConditionsRepository(@ApplicationContext context: Context): CurrentConditionsRepository =
         CurrentConditionsRepository(
-            NetworkModule.provideRetrofitService(),
-            DatabaseModule.provideCurrentConditionsDAO(context)
+            provideRetrofitService(),
+            provideCurrentConditionsDAO(context)
         )
 
     @Provides
-    @ViewModelScoped
     fun getDailyForecastRepository(@ApplicationContext context: Context): DailyForecastRepository =
         DailyForecastRepository(
-            NetworkModule.provideRetrofitService(),
-            DatabaseModule.provideDailyForecastDAO(context)
+            provideRetrofitService(),
+            provideDailyForecastDAO(context)
         )
 
     @Provides
-    @ViewModelScoped
     fun getHourlyForecastRepository(@ApplicationContext context: Context): HourlyForecastRepository =
         HourlyForecastRepository(
-            NetworkModule.provideRetrofitService(),
-            DatabaseModule.provideHourlyForecastDAO(context)
+            provideRetrofitService(),
+            provideHourlyForecastDAO(context)
         )
 }

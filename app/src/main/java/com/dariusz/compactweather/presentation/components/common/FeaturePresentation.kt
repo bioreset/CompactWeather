@@ -1,4 +1,4 @@
-package com.dariusz.compactweather.presentation.components
+package com.dariusz.compactweather.presentation.components.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.dariusz.compactweather.domain.model.CurrentConditions
-import com.dariusz.compactweather.presentation.theme.ThemeTypography
-import com.dariusz.compactweather.presentation.theme.getTypography
+import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
+import com.dariusz.compactweather.presentation.components.theme.getTypography
 
 @Composable
 fun CurrentConditions(input: CurrentConditions) {

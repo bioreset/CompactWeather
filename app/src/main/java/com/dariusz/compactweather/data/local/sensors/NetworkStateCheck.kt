@@ -1,51 +1,57 @@
 package com.dariusz.compactweather.data.local.sensors
 
+import android.content.BroadcastReceiver
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import com.dariusz.compactweather.domain.model.NetworkState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.shareIn
+import javax.inject.Inject
 
-class NetworkStateCheck(
+@ExperimentalCoroutinesApi
+class NetworkStateCheck
+@Inject
+constructor(
     private val context: Context
 ) {
 
-    fun getNetworkStatus() = networkStatus()
+    fun getNetworkStatus() = context.networkStatus()
 
-    private fun networkStatus(): NetworkState {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val currentNetwork = connectivityManager.activeNetwork
-        val networkCapabilities = connectivityManager.getNetworkCapabilities(currentNetwork)!!
-        val wifiManager: WifiManager =
-            context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        return when {
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    wifiManager.isWifiEnabled
-            -> NetworkState(
-                permissionState = true, connectivityState = true
-            )
-            networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-                    networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    !wifiManager.isWifiEnabled
-            -> NetworkState(
-                permissionState = true, connectivityState = false
-            )
-            !networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
-                    !networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
-                    !networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                    wifiManager.isWifiEnabled
-            -> NetworkState(
-                permissionState = false, connectivityState = true
-            )
-            else -> NetworkState(
-                permissionState = false, connectivityState = false
-            )
-        }
+    private fun Context.networkStatus(): Flow<NetworkState> {
+        val wifiManager = getSystemService(Context.WIFI_SERVICE) as? WifiManager
+        val wifiStatus: NetworkState = getWifiStatus(wifiManager!!)
+        return callbackFlow {
+            val wifiScanReceiver = object : BroadcastReceiver() {
+                override fun onReceive(c: Context, intent: Intent) {
+                    if (intent.action == WifiManager.WIFI_STATE_CHANGED_ACTION) {
+                        unregisterReceiver(this)
+                        trySend(wifiStatus).isSuccess
+                    }
+                }
+            }
+            registerReceiver(wifiScanReceiver, IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION))
+            awaitClose {
+                unregisterReceiver(wifiScanReceiver)
+            }
+        }.shareIn(
+            MainScope(),
+            SharingStarted.WhileSubscribed()
+        )
+    }
 
+    private fun getWifiStatus(wifiManager: WifiManager) = isWifiEnabled(wifiManager.isWifiEnabled)
 
+    private fun isWifiEnabled(status: Boolean): NetworkState {
+        return if (status)
+            NetworkState(state = true)
+        else
+            NetworkState(state = false)
     }
 }

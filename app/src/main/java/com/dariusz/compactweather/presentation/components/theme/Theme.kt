@@ -1,4 +1,4 @@
-package com.dariusz.compactweather.presentation.theme
+package com.dariusz.compactweather.presentation.components.theme
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.isSystemInDarkTheme

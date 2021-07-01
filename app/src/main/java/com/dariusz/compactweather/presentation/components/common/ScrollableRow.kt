@@ -1,5 +1,7 @@
-package com.dariusz.compactweather.presentation.components
+package com.dariusz.compactweather.presentation.components.common
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -9,14 +11,18 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.dariusz.compactweather.domain.model.DailyForecast
 import com.dariusz.compactweather.domain.model.HourlyForecast
-import com.dariusz.compactweather.presentation.theme.ThemeTypography
-import com.dariusz.compactweather.presentation.theme.getTypography
+import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
+import com.dariusz.compactweather.presentation.components.theme.getTypography
+import com.dariusz.compactweather.utils.DateTimeUtils.formatDateTime
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
+    val currentContext = LocalContext.current
     LazyRow(modifier = Modifier.fillMaxWidth()) {
         items(hourlyForecast) { item ->
             Card(
@@ -84,7 +90,7 @@ fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
                     style = ThemeTypography.Main.getTypography().body1
                 )
                 Text(
-                    "Updates as of: " + item.dateTime,
+                    "Updates as of: " + formatDateTime(item.dateTime),
                     modifier = Modifier.padding(12.dp),
                     style = ThemeTypography.Main.getTypography().body1
                 )
@@ -93,8 +99,10 @@ fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScrollableDailyForecast(dailyForecast: List<DailyForecast>) {
+    val currentContext = LocalContext.current
     LazyRow(modifier = Modifier.fillMaxWidth()) {
         items(dailyForecast) { item ->
             Card(
@@ -137,12 +145,12 @@ fun ScrollableDailyForecast(dailyForecast: List<DailyForecast>) {
                     style = ThemeTypography.Main.getTypography().body1
                 )
                 Text(
-                    "Mobile Link: " + item.dateTime,
+                    "Mobile Link: " + item.mobileLink,
                     modifier = Modifier.padding(12.dp),
                     style = ThemeTypography.Main.getTypography().body1
                 )
                 Text(
-                    "Updated as of: " + item.dateTime,
+                    "Updated as of: " + formatDateTime(item.dateTime),
                     modifier = Modifier.padding(12.dp),
                     style = ThemeTypography.Main.getTypography().body1
                 )

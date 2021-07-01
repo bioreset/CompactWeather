@@ -1,4 +1,4 @@
-package com.dariusz.compactweather.presentation.components
+package com.dariusz.compactweather.presentation.components.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
