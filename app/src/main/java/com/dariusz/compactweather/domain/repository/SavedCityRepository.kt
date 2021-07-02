@@ -5,7 +5,6 @@ import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiServic
 import com.dariusz.compactweather.domain.model.CurrentLocation
 import com.dariusz.compactweather.domain.model.DataState
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
@@ -18,31 +17,25 @@ class SavedCityRepository
 ) {
 
     suspend fun insertCity(location: CurrentLocation) = flow {
-        emit(DataState.Loading)
-        delay(1000)
         val cityToSave =
             compactWeatherApiService.getCityKeyBasedOnLocation(location.latitude.toString() + "," + location.longitude.toString())
         try {
-            if (savedCityDao.checkIfCityAlreadyExists(cityToSave.cityID) !== cityToSave.cityName){
+            if (savedCityDao.checkIfCityAlreadyExists(cityToSave.cityID) !== cityToSave.cityName) {
                 savedCityDao.insert(cityToSave)
                 emit(DataState.Success(true))
-            }
-            else {
+            } else {
                 emit(DataState.Success(false))
             }
-        }
-        catch(exception: Exception){
+        } catch (exception: Exception) {
             emit(DataState.Error(exception))
         }
     }.shareIn(
         MainScope(),
-        SharingStarted.WhileSubscribed(),
+        SharingStarted.Eagerly,
         1
     )
 
     suspend fun listSavedCitiesFromDB() = flow {
-        emit(DataState.Loading)
-        delay(1000)
         try {
             val savedCitiesInDB = savedCityDao.getAllSavedCities()
             emit(
@@ -55,13 +48,11 @@ class SavedCityRepository
         }
     }.shareIn(
         MainScope(),
-        SharingStarted.WhileSubscribed(),
+        SharingStarted.Eagerly,
         1
     )
 
     suspend fun countCitiesInDB() = flow {
-        emit(DataState.Loading)
-        delay(1000)
         try {
             val countSavedCitiesInDB = savedCityDao.countRecordsInTable()
             emit(
@@ -74,7 +65,7 @@ class SavedCityRepository
         }
     }.shareIn(
         MainScope(),
-        SharingStarted.WhileSubscribed(),
+        SharingStarted.Eagerly,
         1
     )
 }

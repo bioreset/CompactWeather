@@ -8,7 +8,10 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.dariusz.compactweather.presentation.MainViewModel
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,17 +19,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 @Composable
 fun MainAlertBox(viewModel: MainViewModel, currentContext: Context) {
+
     viewModel.getNetworkState(currentContext)
     viewModel.getGpsState(currentContext)
     viewModel.getPermissionState(currentContext)
 
-    val currentGPSStatus by remember(viewModel) { viewModel.gpsStatus }.collectAsState()
-    val currentWifiStatus by remember(viewModel) { viewModel.networkState }.collectAsState()
-    val currentPermissionsStatus by remember(viewModel) { viewModel.permissionsStatus }.collectAsState()
+    val currentGPSStatus = viewModel.gpsStatus.collectAsState()
+    val currentWifiStatus = viewModel.networkState.collectAsState()
+    val currentPermissionsStatus = viewModel.permissionsStatus.collectAsState()
 
-    if (currentGPSStatus.state == false) GpsAlert(currentContext)
-    if (currentWifiStatus.state == false) WifiAlert(currentContext)
-    if (currentPermissionsStatus.state == false) PermissionsAlert()
+    if (currentGPSStatus.value.state == false) GpsAlert(currentContext)
+    if (currentWifiStatus.value.state == false) WifiAlert(currentContext)
+    if (currentPermissionsStatus.value.state == false) PermissionsAlert()
 }
 
 @Composable

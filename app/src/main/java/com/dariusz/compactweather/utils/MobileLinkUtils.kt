@@ -6,7 +6,7 @@ import android.net.Uri
 
 object MobileLinkUtils {
 
-    fun openLinkInBrowser(context: Context, link: String){
+    fun openLinkInBrowser(context: Context, link: String) {
         val defaultBrowser =
             Intent.makeMainSelectorActivity(Intent.ACTION_MAIN, Intent.CATEGORY_APP_BROWSER)
         defaultBrowser.data = Uri.parse(link)

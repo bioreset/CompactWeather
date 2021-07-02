@@ -20,10 +20,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 @Composable
 fun DailyForecastScreen(
+    city_key: String,
     dailyForecastScreenViewModel: DailyForecastViewModel = viewModel()
 ) {
 
-    dailyForecastScreenViewModel.fetchDailyForecast()
+    dailyForecastScreenViewModel.fetchDailyForecast(city_key)
     val dailyForecast by remember(dailyForecastScreenViewModel) { dailyForecastScreenViewModel.dailyForecast }.collectAsState()
 
     Text(text = "Daily Forecast", style = ThemeTypography.Main.getTypography().h5)

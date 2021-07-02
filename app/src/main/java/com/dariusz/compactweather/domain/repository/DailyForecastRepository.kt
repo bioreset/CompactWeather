@@ -5,7 +5,6 @@ import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiServic
 import com.dariusz.compactweather.domain.model.DailyForecast.Companion.dailyForecastsToDB
 import com.dariusz.compactweather.domain.model.DataState
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
@@ -18,8 +17,6 @@ class DailyForecastRepository
 ) {
 
     suspend fun getFiveDayForecast(key: String) = flow {
-        emit(DataState.Loading)
-        delay(1000)
         try {
             val dailyForecast = compactWeatherApiService.getFiveDayForecast(key).value
             dailyForecastDao.insertAll(
@@ -28,7 +25,6 @@ class DailyForecastRepository
                 )
             )
             val dailyForecastFromDB = dailyForecastDao.getAllDailyForecasts()
-            delay(500)
             emit(
                 DataState.Success(
                     dailyForecastFromDB
@@ -39,7 +35,7 @@ class DailyForecastRepository
         }
     }.shareIn(
         MainScope(),
-        SharingStarted.WhileSubscribed(),
+        SharingStarted.Eagerly,
         1
     )
 }

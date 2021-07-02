@@ -9,10 +9,7 @@ import com.google.android.gms.location.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -53,9 +50,10 @@ class CurrentLocationCheck
             awaitClose {
                 removeLocationUpdates(locationCallback)
             }
-        }.shareIn(
+        }.stateIn(
             MainScope(),
-            SharingStarted.WhileSubscribed()
+            SharingStarted.WhileSubscribed(),
+            CurrentLocation(0.0, 0.0)
         )
 
     private fun setLocationData(location: Location) =

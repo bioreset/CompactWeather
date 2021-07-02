@@ -18,14 +18,18 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 object SensorDataModule {
 
     @Provides
-    fun provideCurrentLocationCheck(@ApplicationContext context: Context): CurrentLocationCheck = CurrentLocationCheck(context)
+    fun provideCurrentLocationCheck(@ApplicationContext context: Context): CurrentLocationCheck =
+        CurrentLocationCheck(context)
 
     @Provides
-    fun provideNetworkStateCheck(@ApplicationContext context: Context): NetworkStateCheck = NetworkStateCheck(context)
+    fun provideNetworkStateCheck(@ApplicationContext context: Context): NetworkStateCheck =
+        NetworkStateCheck(context)
 
     @Provides
-    fun provideGpsStateCheck(@ApplicationContext context: Context): GPSStateCheck = GPSStateCheck(context)
+    fun provideGpsStateCheck(@ApplicationContext context: Context): GPSStateCheck =
+        GPSStateCheck(context)
 
     @Provides
-    fun providePermissionStateCheck(@ApplicationContext context: Context): PermissionsCheck = PermissionsCheck(context)
+    fun providePermissionStateCheck(@ApplicationContext context: Context): PermissionsCheck =
+        PermissionsCheck(context)
 }

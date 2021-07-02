@@ -25,7 +25,7 @@ fun CWApp() {
     val currentContext = LocalContext.current
     val mainViewModel: MainViewModel = viewModel()
     CompactWeatherTheme(theme) {
-        MainAlertBox(mainViewModel, currentContext)
         MainNavigationHost(currentNavController, currentContext)
+        MainAlertBox(mainViewModel, currentContext)
     }
 }

@@ -9,10 +9,7 @@ import com.dariusz.compactweather.domain.model.GpsState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -43,9 +40,10 @@ constructor(
             awaitClose {
                 unregisterReceiver(gpsSwitchStateReceiver)
             }
-        }.shareIn(
+        }.stateIn(
             MainScope(),
-            SharingStarted.WhileSubscribed()
+            SharingStarted.WhileSubscribed(),
+            GpsState()
         )
     }
 

@@ -9,7 +9,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 class PermissionsCheck
@@ -26,9 +26,10 @@ constructor(
             handlePermissionCheck(checkPermissions(applicationContext, mandatoryPermissions))
         return flow {
             emit(permissionStatus)
-        }.shareIn(
+        }.stateIn(
             MainScope(),
-            SharingStarted.WhileSubscribed()
+            SharingStarted.WhileSubscribed(),
+            PermissionsState()
         )
     }
 

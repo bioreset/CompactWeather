@@ -9,7 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import com.dariusz.compactweather.di.RepositoryModule.getCurrentConditionsRepository
 import com.dariusz.compactweather.di.RepositoryModule.getDailyForecastRepository
 import com.dariusz.compactweather.di.RepositoryModule.getHourlyForecastRepository
 import com.dariusz.compactweather.di.RepositoryModule.getSavedCityRepository
@@ -32,50 +32,51 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 @Composable
 fun MainNavigationHost(navController: NavController, context: Context) {
-    val mainViewModel: MainViewModel = viewModel()
     NavHost(
         navController = navController as NavHostController,
         startDestination = Screens.AppScreens.SplashScreen.route
     ) {
-        composable(Screens.AppScreens.SplashScreen.route) {
+        composable(route = Screens.AppScreens.SplashScreen.route) {
             val splashScreenViewModel: SplashScreenViewModel = viewModel(
                 factory = SplashScreenViewModelFactory(
                     getSavedCityRepository(context)
                 )
             )
+            val mainViewModel: MainViewModel = viewModel()
             SplashScreen(splashScreenViewModel, mainViewModel, context, navController)
         }
-        navigation(startDestination = Screens.AppScreens.HomeScreen.route, route = "Home") {
-            composable(Screens.AppScreens.HomeScreen.route) {
-                val homeScreenViewModel: HomeScreenViewModel = viewModel(
-                    factory = HomeScreenViewModelFactory(
-                        getSavedCityRepository(context)
-                    )
+        composable(route = Screens.AppScreens.HomeScreen.route) {
+            val homeScreenViewModel: HomeScreenViewModel = viewModel(
+                factory = HomeScreenViewModelFactory(
+                    getCurrentConditionsRepository(context),
+                    getSavedCityRepository(context)
                 )
-                HomeScreen(homeScreenViewModel, navController)
-            }
-            composable(Screens.AppScreens.DailyForecastScreen.route) {
-                val dailyForecastScreenViewModel: DailyForecastViewModel = viewModel(
-                    factory = DailyForecastViewModelFactory(
-                        getDailyForecastRepository(context)
-                    )
-
+            )
+            HomeScreen(homeScreenViewModel, navController)
+        }
+        composable(route = Screens.AppScreens.DailyForecastScreen.route.plus("/{city_key}")) {
+            val dailyForecastScreenViewModel: DailyForecastViewModel = viewModel(
+                factory = DailyForecastViewModelFactory(
+                    getDailyForecastRepository(context)
                 )
-                DailyForecastScreen(
-                    dailyForecastScreenViewModel
+            )
+            DailyForecastScreen(
+                it.arguments?.getString("city_key") ?: "",
+                dailyForecastScreenViewModel
+            )
+        }
+        composable(route = Screens.AppScreens.HourlyForecastScreen.route.plus("/{city_key}")) {
+            val hourlyForecastScreenViewModel: HourlyForecastViewModel = viewModel(
+                factory = HourlyForecastViewModelFactory(
+                    getHourlyForecastRepository(context)
                 )
-            }
-            composable(Screens.AppScreens.HourlyForecastScreen.route) {
-                val hourlyForecastScreenViewModel: HourlyForecastViewModel = viewModel(
-                    factory = HourlyForecastViewModelFactory(
-                        getHourlyForecastRepository(context)
-                    )
-
-                )
-                HourlyForecastScreen(
-                    hourlyForecastScreenViewModel
-                )
-            }
+            )
+            HourlyForecastScreen(
+                it.arguments?.getString("city_key") ?: "",
+                hourlyForecastScreenViewModel
+            )
         }
     }
 }
+
+

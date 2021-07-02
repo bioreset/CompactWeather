@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.domain.model.HourlyForecast
 import com.dariusz.compactweather.domain.repository.HourlyForecastRepository
-import com.dariusz.compactweather.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,11 +23,12 @@ constructor(
         MutableStateFlow<DataState<List<HourlyForecast>>>(DataState.Loading)
     val hourlyForecast: StateFlow<DataState<List<HourlyForecast>>> = _hourlyForecast
 
-    fun fetchHourlyForecast() = viewModelScope.launch {
+    fun fetchHourlyForecast(cityID: String) = viewModelScope.launch {
         hourlyForecastRepository
-            .getTwelveFourHourForecast(Constants.CITY_KEY_FOR_TESTS)
+            .getTwelveFourHourForecast(cityID)
             .collect {
                 _hourlyForecast.value = it
             }
     }
+
 }

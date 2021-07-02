@@ -57,8 +57,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling:${rootProject.extra["compose_version"]}")
     implementation("androidx.compose.foundation:foundation:${rootProject.extra["compose_version"]}")
     implementation("com.google.android.material:compose-theme-adapter:${rootProject.extra["compose_version"]}")
-    implementation("androidx.activity:activity-compose:1.3.0-beta02")
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha03")
+    implementation("androidx.activity:activity-compose:1.3.0-rc01")
+    implementation("androidx.navigation:navigation-compose:2.4.0-alpha04")
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.0-alpha08")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")

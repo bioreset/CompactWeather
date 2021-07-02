@@ -32,10 +32,6 @@ fun SplashScreen(
     val savedCitiesCount by remember(mainViewModel) { splashScreenViewModel.savedCitiesCount }.collectAsState()
 
     when (savedCitiesCount) {
-        is DataState.Loading -> {
-        }
-        is DataState.Error -> {
-        }
         is DataState.Success<Int> -> {
             if ((savedCitiesCount as DataState.Success<Int>).data == 0) {
                 LaunchButton {
@@ -46,6 +42,8 @@ fun SplashScreen(
             } else {
                 navigateTo(navController, Screens.AppScreens.HomeScreen.route)
             }
+        }
+        else -> {
         }
     }
 

@@ -6,7 +6,7 @@ import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
 
 data class AppTheme(
     val primaryColor: ThemeColor = ThemeColor.Blue,
-    val secondaryColor: ThemeColor = ThemeColor.Yellow,
+    val secondaryColor: ThemeColor = ThemeColor.Purple,
     val shapesFamily: ThemeShapesFamily = ThemeShapesFamily.Rounded,
     val mainTypography: ThemeTypography = ThemeTypography.Main
 )
