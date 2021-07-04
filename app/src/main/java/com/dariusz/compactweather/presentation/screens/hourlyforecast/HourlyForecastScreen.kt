@@ -1,7 +1,5 @@
 package com.dariusz.compactweather.presentation.screens.hourlyforecast
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -14,10 +12,7 @@ import com.dariusz.compactweather.presentation.components.common.LoadingComponen
 import com.dariusz.compactweather.presentation.components.common.ScrollableHourlyForecast
 import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
 import com.dariusz.compactweather.presentation.components.theme.getTypography
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@RequiresApi(Build.VERSION_CODES.O)
-@ExperimentalCoroutinesApi
 @Composable
 fun HourlyForecastScreen(
     city_key: String,
@@ -25,19 +20,28 @@ fun HourlyForecastScreen(
 ) {
 
     hourlyForecastScreenViewModel.fetchHourlyForecast(city_key)
-    val hourlyForecast by remember(hourlyForecastScreenViewModel) { hourlyForecastScreenViewModel.hourlyForecast }.collectAsState()
+
+    val hourlyForecast by remember(hourlyForecastScreenViewModel) {
+        hourlyForecastScreenViewModel.hourlyForecast
+    }.collectAsState()
 
     Text(text = "Hourly Forecast", style = ThemeTypography.Main.getTypography().h5)
-    when (hourlyForecast) {
+
+    ManageHourlyForecast(input = hourlyForecast)
+
+}
+
+@Composable
+fun ManageHourlyForecast(input: DataState<List<HourlyForecast>>) {
+    when (input) {
         is DataState.Loading -> {
             LoadingComponent()
         }
         is DataState.Success<List<HourlyForecast>> -> {
-            ScrollableHourlyForecast((hourlyForecast as DataState.Success<List<HourlyForecast>>).data)
+            ScrollableHourlyForecast(input.data)
         }
         is DataState.Error -> {
             Text("Error: Hourly forecast")
         }
     }
-
 }

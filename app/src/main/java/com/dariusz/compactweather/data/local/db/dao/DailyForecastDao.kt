@@ -10,7 +10,7 @@ import com.dariusz.compactweather.domain.model.DailyForecast
 interface DailyForecastDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(dailyForecastJson: List<DailyForecast>)
+    suspend fun insertAll(dailyForecastJsonList: List<DailyForecast>)
 
     @Query("DELETE FROM dailyforecast;")
     suspend fun deleteAllDailyForecasts()

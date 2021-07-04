@@ -12,14 +12,21 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+interface GPSStateCheck {
+
+    val currentGpsStatus: Flow<GpsState>
+
+}
+
 @ExperimentalCoroutinesApi
-class GPSStateCheck
+class GPSStateCheckImpl
 @Inject
 constructor(
-    private val context: Context
-) {
+    context: Context
+) : GPSStateCheck {
 
-    fun getGPSStatus() = context.gpsStatus()
+    override val currentGpsStatus: Flow<GpsState> =
+        context.gpsStatus().shareIn(MainScope(), SharingStarted.WhileSubscribed())
 
     private fun Context.gpsStatus(): Flow<GpsState> {
         val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -40,11 +47,7 @@ constructor(
             awaitClose {
                 unregisterReceiver(gpsSwitchStateReceiver)
             }
-        }.stateIn(
-            MainScope(),
-            SharingStarted.WhileSubscribed(),
-            GpsState()
-        )
+        }
     }
 
     private fun checkGpsStatus(locationManager: LocationManager) = isGpsEnabled(

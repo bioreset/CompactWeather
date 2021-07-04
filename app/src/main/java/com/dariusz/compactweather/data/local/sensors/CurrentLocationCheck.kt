@@ -7,23 +7,27 @@ import android.os.Looper
 import com.dariusz.compactweather.domain.model.CurrentLocation
 import com.google.android.gms.location.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+interface CurrentLocationCheck {
+
+    suspend fun getCurrentLocation(): Flow<CurrentLocation>
+
+}
+
 @ExperimentalCoroutinesApi
 @SuppressLint("MissingPermission")
-class CurrentLocationCheck
+class CurrentLocationCheckImpl
 @Inject constructor(
     private val context: Context
-) {
+) : CurrentLocationCheck {
 
-    suspend fun getCurrentLocation(): Flow<CurrentLocation> {
+    override suspend fun getCurrentLocation(): Flow<CurrentLocation> {
         val fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(context)
         return fusedLocationProviderClient.getCurrentLocationAsFlow()
-
     }
 
     private suspend fun FusedLocationProviderClient.getCurrentLocationAsFlow(): Flow<CurrentLocation> =
@@ -50,11 +54,7 @@ class CurrentLocationCheck
             awaitClose {
                 removeLocationUpdates(locationCallback)
             }
-        }.stateIn(
-            MainScope(),
-            SharingStarted.WhileSubscribed(),
-            CurrentLocation(0.0, 0.0)
-        )
+        }
 
     private fun setLocationData(location: Location) =
         CurrentLocation(

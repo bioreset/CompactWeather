@@ -10,12 +10,12 @@ import com.dariusz.compactweather.domain.model.CurrentConditions
 interface CurrentConditionsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(currentConditions: CurrentConditions)
+    suspend fun insertAll(currentConditions: List<CurrentConditions>)
 
     @Query("DELETE FROM currentconditions;")
     suspend fun deleteAllCurrentConditions()
 
     @Query("SELECT * FROM currentconditions;")
-    suspend fun getAllCurrentConditions(): CurrentConditions
+    suspend fun getAllCurrentConditions(): List<CurrentConditions>
 
 }

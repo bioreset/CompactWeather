@@ -13,9 +13,8 @@ import com.dariusz.compactweather.domain.model.NetworkState
 import com.dariusz.compactweather.domain.model.PermissionsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,8 +25,11 @@ class MainViewModel
 constructor(
 ) : ViewModel() {
 
-    private var _currentLocation = MutableStateFlow(CurrentLocation(0.0, 0.0))
-    val currentLocation: StateFlow<CurrentLocation> = _currentLocation
+    private var _currentLocation = MutableSharedFlow<CurrentLocation>(
+        replay = 1, onBufferOverflow = BufferOverflow.DROP_LATEST
+    )
+    val currentLocation: SharedFlow<CurrentLocation> = _currentLocation
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
 
     private var _networkState = MutableStateFlow(NetworkState())
     val networkState: StateFlow<NetworkState> = _networkState
@@ -39,16 +41,12 @@ constructor(
     val permissionsStatus: StateFlow<PermissionsState> = _permissionsStatus
 
     fun getLocationData(context: Context) = viewModelScope.launch {
-        provideCurrentLocationCheck(context)
-            .getCurrentLocation()
-            .collect {
-                _currentLocation.value = it
-            }
+        _currentLocation.emitAll(provideCurrentLocationCheck(context).getCurrentLocation())
     }
 
     fun getNetworkState(context: Context) = viewModelScope.launch {
         provideNetworkStateCheck(context)
-            .getNetworkStatus()
+            .currentNetworkStatus
             .collect {
                 _networkState.value = it
             }
@@ -56,7 +54,7 @@ constructor(
 
     fun getGpsState(context: Context) = viewModelScope.launch {
         provideGpsStateCheck(context)
-            .getGPSStatus()
+            .currentGpsStatus
             .collect {
                 _gpsStatus.value = it
             }
@@ -64,7 +62,7 @@ constructor(
 
     fun getPermissionState(context: Context) = viewModelScope.launch {
         providePermissionStateCheck(context)
-            .getLivePermissionStatus()
+            .currentPermissionStatus
             .collect {
                 _permissionsStatus.value = it
             }

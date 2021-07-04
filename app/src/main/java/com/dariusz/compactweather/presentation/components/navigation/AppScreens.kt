@@ -10,7 +10,6 @@ sealed class Screens(val route: String, val title: String) {
         route,
         title
     ) {
-        object SplashScreen : AppScreens("splash", "Splash")
         object HomeScreen : AppScreens("home", "Home")
         object DailyForecastScreen : AppScreens("dailyforecast", "Daily Forecast")
         object HourlyForecastScreen : AppScreens("hourlyforecast", "Hourly Forecast")

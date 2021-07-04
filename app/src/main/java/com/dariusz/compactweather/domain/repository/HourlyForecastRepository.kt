@@ -5,40 +5,37 @@ import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiServic
 import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.domain.model.HourlyForecast
 import com.dariusz.compactweather.domain.model.HourlyForecast.Companion.hourlyForecastsToDB
-import kotlinx.coroutines.MainScope
+import com.dariusz.compactweather.utils.NetworkBoundResource.networkBoundResource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
-class HourlyForecastRepository
+interface HourlyForecastRepository {
+
+    suspend fun getFinalTwentyFourHourForecast(key: String): Flow<DataState<List<HourlyForecast>>>
+
+}
+
+class HourlyForecastRepositoryImpl
 @Inject constructor(
     private val compactWeatherApiService: CompactWeatherApiService,
     private val hourlyForecastDao: HourlyForecastDao
-) {
+) : HourlyForecastRepository {
 
-    suspend fun getTwelveFourHourForecast(key: String): Flow<DataState<List<HourlyForecast>>> =
-        flow {
-            try {
-                val hourlyForecast = compactWeatherApiService.getTwelveFourHourForecast(key)
-                hourlyForecastDao.insertAll(
-                    hourlyForecastsToDB(
-                        hourlyForecast
-                    )
-                )
-                val hourlyForecastFromDB = hourlyForecastDao.getAllHourlyForecasts()
-                emit(
-                    DataState.Success(
-                        hourlyForecastFromDB
-                    )
-                )
-            } catch (exception: Exception) {
-                emit(DataState.Error(exception))
-            }
-        }.shareIn(
-            MainScope(),
-            SharingStarted.Eagerly,
-            1
+    override suspend fun getFinalTwentyFourHourForecast(key: String): Flow<DataState<List<HourlyForecast>>> =
+        networkBoundResource(
+            dataFromNetwork = getTwentyFourHourForecast(key),
+            insertDataFromNetworkToDB = { insertTwelveFourHourForecast(hourlyForecastsToDB(it)) },
+            selectFetchedData = getTwelveFourHourForecastFromDB()
         )
+
+    private suspend fun getTwentyFourHourForecast(key: String) =
+        compactWeatherApiService.getTwentyFourHourForecast(key)
+
+    private suspend fun insertTwelveFourHourForecast(inputData: List<HourlyForecast>) {
+        hourlyForecastDao.deleteAllHourlyForecasts()
+        hourlyForecastDao.insertAll(inputData)
+    }
+
+    private suspend fun getTwelveFourHourForecastFromDB() =
+        hourlyForecastDao.getAllHourlyForecasts()
 }

@@ -9,17 +9,27 @@ import com.dariusz.compactweather.domain.model.NetworkState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
+interface NetworkStateCheck {
+
+    val currentNetworkStatus: Flow<NetworkState>
+
+}
+
 @ExperimentalCoroutinesApi
-class NetworkStateCheck
+class NetworkStateCheckImpl
 @Inject
 constructor(
-    private val context: Context
-) {
+    context: Context
+) : NetworkStateCheck {
 
-    fun getNetworkStatus() = context.networkStatus()
+    override val currentNetworkStatus: Flow<NetworkState> =
+        context.networkStatus().shareIn(MainScope(), SharingStarted.WhileSubscribed())
 
     private fun Context.networkStatus(): Flow<NetworkState> {
         val wifiManager = getSystemService(Context.WIFI_SERVICE) as? WifiManager
@@ -37,11 +47,7 @@ constructor(
             awaitClose {
                 unregisterReceiver(wifiScanReceiver)
             }
-        }.stateIn(
-            MainScope(),
-            SharingStarted.WhileSubscribed(),
-            NetworkState()
-        )
+        }
     }
 
     private fun getWifiStatus(wifiManager: WifiManager) = isWifiEnabled(wifiManager.isWifiEnabled)

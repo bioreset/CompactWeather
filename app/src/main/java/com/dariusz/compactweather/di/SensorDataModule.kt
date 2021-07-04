@@ -1,10 +1,7 @@
 package com.dariusz.compactweather.di
 
 import android.content.Context
-import com.dariusz.compactweather.data.local.sensors.CurrentLocationCheck
-import com.dariusz.compactweather.data.local.sensors.GPSStateCheck
-import com.dariusz.compactweather.data.local.sensors.NetworkStateCheck
-import com.dariusz.compactweather.data.local.sensors.PermissionsCheck
+import com.dariusz.compactweather.data.local.sensors.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,17 +16,17 @@ object SensorDataModule {
 
     @Provides
     fun provideCurrentLocationCheck(@ApplicationContext context: Context): CurrentLocationCheck =
-        CurrentLocationCheck(context)
+        CurrentLocationCheckImpl(context)
 
     @Provides
     fun provideNetworkStateCheck(@ApplicationContext context: Context): NetworkStateCheck =
-        NetworkStateCheck(context)
+        NetworkStateCheckImpl(context)
 
     @Provides
     fun provideGpsStateCheck(@ApplicationContext context: Context): GPSStateCheck =
-        GPSStateCheck(context)
+        GPSStateCheckImpl(context)
 
     @Provides
     fun providePermissionStateCheck(@ApplicationContext context: Context): PermissionsCheck =
-        PermissionsCheck(context)
+        PermissionsCheckImpl(context)
 }

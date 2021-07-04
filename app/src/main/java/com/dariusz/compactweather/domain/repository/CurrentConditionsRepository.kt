@@ -2,31 +2,41 @@ package com.dariusz.compactweather.domain.repository
 
 import com.dariusz.compactweather.data.local.db.dao.CurrentConditionsDao
 import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiService
+import com.dariusz.compactweather.domain.model.CurrentConditions
 import com.dariusz.compactweather.domain.model.CurrentConditions.Companion.currentConditionsToDB
 import com.dariusz.compactweather.domain.model.DataState
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
+import com.dariusz.compactweather.utils.NetworkBoundResource.networkBoundResource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class CurrentConditionsRepository
+interface CurrentConditionsRepository {
+
+    suspend fun getCurrentConditionsData(key: String): Flow<DataState<List<CurrentConditions>>>
+
+}
+
+class CurrentConditionsRepositoryImpl
 @Inject constructor(
     private val compactWeatherApiService: CompactWeatherApiService,
     private val currentConditionsDao: CurrentConditionsDao
-) {
-    suspend fun getCurrentWeather(key: String) = flow {
-        try {
-            val currentWeather = compactWeatherApiService.getCurrentWeather(key)
-            currentConditionsDao.insertAll(currentConditionsToDB(currentWeather))
-            val currentWeatherFromDB = currentConditionsDao.getAllCurrentConditions()
-            emit(DataState.Success(currentWeatherFromDB))
-        } catch (exception: Exception) {
-            emit(DataState.Error(exception))
-        }
-    }.shareIn(
-        MainScope(),
-        SharingStarted.Eagerly,
-        1
-    )
+) : CurrentConditionsRepository {
+
+    override suspend fun getCurrentConditionsData(key: String): Flow<DataState<List<CurrentConditions>>> =
+        networkBoundResource(
+            dataFromNetwork = getCurrentWeather(key),
+            insertDataFromNetworkToDB = { insertCurrentConditions(currentConditionsToDB(it)) },
+            selectFetchedData = getCurrentWeatherFromDB()
+        )
+
+    private suspend fun getCurrentWeather(key: String) =
+        compactWeatherApiService.getCurrentWeather(key)
+
+    private suspend fun insertCurrentConditions(currentConditions: List<CurrentConditions>) {
+        currentConditionsDao.deleteAllCurrentConditions()
+        currentConditionsDao.insertAll(currentConditions)
+    }
+
+    private suspend fun getCurrentWeatherFromDB() =
+        currentConditionsDao.getAllCurrentConditions()
+
 }

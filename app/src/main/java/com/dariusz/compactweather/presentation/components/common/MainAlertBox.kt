@@ -2,6 +2,7 @@ package com.dariusz.compactweather.presentation.components.common
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,25 +13,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dariusz.compactweather.presentation.MainViewModel
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlin.properties.Delegates
 
 @ExperimentalCoroutinesApi
 @Composable
-fun MainAlertBox(viewModel: MainViewModel, currentContext: Context) {
+fun MainAlertBox(mainViewModel: MainViewModel = viewModel(), currentContext: Context) {
 
-    viewModel.getNetworkState(currentContext)
-    viewModel.getGpsState(currentContext)
-    viewModel.getPermissionState(currentContext)
+    mainViewModel.getNetworkState(currentContext)
+    mainViewModel.getGpsState(currentContext)
+    mainViewModel.getPermissionState(currentContext)
 
-    val currentGPSStatus = viewModel.gpsStatus.collectAsState()
-    val currentWifiStatus = viewModel.networkState.collectAsState()
-    val currentPermissionsStatus = viewModel.permissionsStatus.collectAsState()
+    val currentGPSStatus = mainViewModel.gpsStatus.collectAsState()
+    val currentWifiStatus = mainViewModel.networkState.collectAsState()
+    val currentPermissionsStatus = mainViewModel.permissionsStatus.collectAsState()
 
     if (currentGPSStatus.value.state == false) GpsAlert(currentContext)
     if (currentWifiStatus.value.state == false) WifiAlert(currentContext)
-    if (currentPermissionsStatus.value.state == false) PermissionsAlert()
+    if (currentPermissionsStatus.value.state == false) PermissionsAlert(currentContext)
 }
 
 @Composable
@@ -82,12 +86,14 @@ fun GpsAlert(currentContext: Context) {
 }
 
 @Composable
-fun PermissionsAlert() {
+fun PermissionsAlert(currentContext: Context) {
+    val permissionsState = remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf(true) }
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { isGranted ->
-        openDialog.value = isGranted.containsValue(false)
+        openDialog.value = !isGranted.containsValue(true)
+        permissionsState.value = isGranted.containsValue(true)
     }
     if (openDialog.value) {
         AlertDialog(
@@ -98,9 +104,8 @@ fun PermissionsAlert() {
                 TextButton(
                     onClick = {
                         openDialog.value = false
-                        launcher.launch(
-                            mandatoryPermissions.toTypedArray()
-                        )
+                        if (isPermissionGranted(currentContext) && permissionsState.value)
+                            launcher.launch(mandatoryPermissions.toTypedArray())
                     }
                 ) {
                     Text("Ok")
@@ -108,4 +113,15 @@ fun PermissionsAlert() {
             },
         )
     }
+}
+
+private fun isPermissionGranted(context: Context): Boolean {
+    var result by Delegates.notNull<Boolean>()
+    for (permission in mandatoryPermissions) {
+        result = ActivityCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+    return result
 }

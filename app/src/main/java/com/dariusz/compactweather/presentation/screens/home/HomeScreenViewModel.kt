@@ -3,14 +3,13 @@ package com.dariusz.compactweather.presentation.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dariusz.compactweather.domain.model.CurrentConditions
+import com.dariusz.compactweather.domain.model.CurrentLocation
 import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.domain.model.SavedCity
 import com.dariusz.compactweather.domain.repository.CurrentConditionsRepository
 import com.dariusz.compactweather.domain.repository.SavedCityRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,14 +24,16 @@ constructor(
     private val _listOfSavedCities =
         MutableStateFlow<DataState<List<SavedCity>>>(DataState.Loading)
     val listOfSavedCities: StateFlow<DataState<List<SavedCity>>> = _listOfSavedCities
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.Loading)
 
     private val _currentConditions =
-        MutableStateFlow<DataState<CurrentConditions>>(DataState.Loading)
-    val currentConditions: StateFlow<DataState<CurrentConditions>> = _currentConditions
+        MutableStateFlow<DataState<List<CurrentConditions>>>(DataState.Loading)
+    val currentConditions: StateFlow<DataState<List<CurrentConditions>>> = _currentConditions
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.Loading)
 
-    fun getListOfSavedCities() = viewModelScope.launch {
+    fun manageCities(location: CurrentLocation) = viewModelScope.launch {
         savedCityRepository
-            .listSavedCitiesFromDB()
+            .manageCities(location)
             .collect {
                 _listOfSavedCities.value = it
             }
@@ -40,7 +41,7 @@ constructor(
 
     fun getCurrentConditions(cityID: String) = viewModelScope.launch {
         currentConditionsRepository
-            .getCurrentWeather(cityID)
+            .getCurrentConditionsData(cityID)
             .collect {
                 _currentConditions.value = it
             }

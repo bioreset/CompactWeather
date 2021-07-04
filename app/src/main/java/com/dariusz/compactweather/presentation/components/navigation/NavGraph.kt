@@ -23,28 +23,17 @@ import com.dariusz.compactweather.presentation.screens.home.HomeScreenViewModelF
 import com.dariusz.compactweather.presentation.screens.hourlyforecast.HourlyForecastScreen
 import com.dariusz.compactweather.presentation.screens.hourlyforecast.HourlyForecastViewModel
 import com.dariusz.compactweather.presentation.screens.hourlyforecast.HourlyForecastViewModelFactory
-import com.dariusz.compactweather.presentation.screens.splash.SplashScreen
-import com.dariusz.compactweather.presentation.screens.splash.SplashScreenViewModel
-import com.dariusz.compactweather.presentation.screens.splash.SplashScreenViewModelFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @RequiresApi(Build.VERSION_CODES.O)
 @ExperimentalCoroutinesApi
 @Composable
 fun MainNavigationHost(navController: NavController, context: Context) {
+    val mainViewModel: MainViewModel = viewModel()
     NavHost(
         navController = navController as NavHostController,
-        startDestination = Screens.AppScreens.SplashScreen.route
+        startDestination = Screens.AppScreens.HomeScreen.route
     ) {
-        composable(route = Screens.AppScreens.SplashScreen.route) {
-            val splashScreenViewModel: SplashScreenViewModel = viewModel(
-                factory = SplashScreenViewModelFactory(
-                    getSavedCityRepository(context)
-                )
-            )
-            val mainViewModel: MainViewModel = viewModel()
-            SplashScreen(splashScreenViewModel, mainViewModel, context, navController)
-        }
         composable(route = Screens.AppScreens.HomeScreen.route) {
             val homeScreenViewModel: HomeScreenViewModel = viewModel(
                 factory = HomeScreenViewModelFactory(
@@ -52,7 +41,8 @@ fun MainNavigationHost(navController: NavController, context: Context) {
                     getSavedCityRepository(context)
                 )
             )
-            HomeScreen(homeScreenViewModel, navController)
+
+            HomeScreen(homeScreenViewModel, mainViewModel, context, navController)
         }
         composable(route = Screens.AppScreens.DailyForecastScreen.route.plus("/{city_key}")) {
             val dailyForecastScreenViewModel: DailyForecastViewModel = viewModel(

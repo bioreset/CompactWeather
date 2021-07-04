@@ -6,10 +6,7 @@ import com.dariusz.compactweather.di.DatabaseModule.provideDailyForecastDAO
 import com.dariusz.compactweather.di.DatabaseModule.provideHourlyForecastDAO
 import com.dariusz.compactweather.di.DatabaseModule.provideSavedCitiesDAO
 import com.dariusz.compactweather.di.NetworkModule.provideRetrofitService
-import com.dariusz.compactweather.domain.repository.CurrentConditionsRepository
-import com.dariusz.compactweather.domain.repository.DailyForecastRepository
-import com.dariusz.compactweather.domain.repository.HourlyForecastRepository
-import com.dariusz.compactweather.domain.repository.SavedCityRepository
+import com.dariusz.compactweather.domain.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,29 +19,28 @@ object RepositoryModule {
 
     @Provides
     fun getSavedCityRepository(@ApplicationContext context: Context): SavedCityRepository =
-        SavedCityRepository(
+        SavedCityRepositoryImpl(
             provideRetrofitService(),
             provideSavedCitiesDAO(context)
         )
 
-
     @Provides
     fun getCurrentConditionsRepository(@ApplicationContext context: Context): CurrentConditionsRepository =
-        CurrentConditionsRepository(
+        CurrentConditionsRepositoryImpl(
             provideRetrofitService(),
             provideCurrentConditionsDAO(context)
         )
 
     @Provides
     fun getDailyForecastRepository(@ApplicationContext context: Context): DailyForecastRepository =
-        DailyForecastRepository(
+        DailyForecastRepositoryImpl(
             provideRetrofitService(),
             provideDailyForecastDAO(context)
         )
 
     @Provides
     fun getHourlyForecastRepository(@ApplicationContext context: Context): HourlyForecastRepository =
-        HourlyForecastRepository(
+        HourlyForecastRepositoryImpl(
             provideRetrofitService(),
             provideHourlyForecastDAO(context)
         )

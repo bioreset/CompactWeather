@@ -9,28 +9,30 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
-class PermissionsCheck
+interface PermissionsCheck {
+
+    val currentPermissionStatus: Flow<PermissionsState>
+
+}
+
+class PermissionsCheckImpl
 @Inject
 constructor(
-    private val context: Context
-) {
+    context: Context
+) : PermissionsCheck {
 
-    fun getLivePermissionStatus() =
-        context.livePermissionsStatus()
+    override val currentPermissionStatus: Flow<PermissionsState> =
+        context.livePermissionsStatus().shareIn(MainScope(), SharingStarted.WhileSubscribed())
 
     private fun Context.livePermissionsStatus(): Flow<PermissionsState> {
         val permissionStatus =
             handlePermissionCheck(checkPermissions(applicationContext, mandatoryPermissions))
         return flow {
             emit(permissionStatus)
-        }.stateIn(
-            MainScope(),
-            SharingStarted.WhileSubscribed(),
-            PermissionsState()
-        )
+        }
     }
 
     private fun handlePermissionCheck(status: Boolean): PermissionsState {
