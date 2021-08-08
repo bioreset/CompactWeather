@@ -4,19 +4,17 @@ import androidx.navigation.NavController
 
 object NavigationUtils {
 
-    fun navigateToWithArguments(
-        navController: NavController,
+    fun NavController.navigateToWithArguments(
         screenRoute: String,
         argument: String? = null
     ) {
-        navController.navigate(screenRoute.plus("/$argument")) {
-            navController.graph.startDestinationRoute?.let { route ->
+        navigate(screenRoute.plus("/$argument")) {
+            graph.startDestinationRoute?.let { route ->
                 popUpTo(route) {
                     saveState = true
                 }
             }
             launchSingleTop = true
-            restoreState = true
         }
     }
 

@@ -1,12 +1,12 @@
 package com.dariusz.compactweather.domain.model
 
-import com.dariusz.compactweather.presentation.components.theme.ThemeColor
-import com.dariusz.compactweather.presentation.components.theme.ThemeShapesFamily
-import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
+import androidx.compose.material.Shapes
+import androidx.compose.material.Typography
+import androidx.compose.ui.graphics.Color
 
 data class AppTheme(
-    val primaryColor: ThemeColor = ThemeColor.Blue,
-    val secondaryColor: ThemeColor = ThemeColor.Purple,
-    val shapesFamily: ThemeShapesFamily = ThemeShapesFamily.Rounded,
-    val mainTypography: ThemeTypography = ThemeTypography.Main
+    val primaryColor: Color? = null,
+    val secondaryColor: Color? = null,
+    val shapesFamily: Shapes? = null,
+    val mainTypography: Typography? = null
 )

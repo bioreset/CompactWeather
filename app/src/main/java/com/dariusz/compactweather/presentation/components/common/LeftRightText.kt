@@ -15,8 +15,8 @@ import com.dariusz.compactweather.domain.model.CurrentConditions
 import com.dariusz.compactweather.domain.model.SavedCity
 import com.dariusz.compactweather.presentation.components.navigation.Screens
 import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
-import com.dariusz.compactweather.presentation.components.theme.getTypography
-import com.dariusz.compactweather.utils.NavigationUtils
+import com.dariusz.compactweather.utils.DateTimeUtils.parseDate
+import com.dariusz.compactweather.utils.NavigationUtils.navigateToWithArguments
 
 @Composable
 fun CurrentConditionsPresentation(
@@ -34,7 +34,7 @@ fun CurrentConditionsPresentation(
         items(savedCitiesList) {
             Text(
                 text = "Current Conditions in your location: ",
-                style = ThemeTypography.Main.getTypography().h5
+                style = ThemeTypography.h5
             )
             LeftRightText(left = "Date: ", right = input.datetime)
             LeftRightText(left = "Weather condition: ", right = input.weatherCondition)
@@ -44,7 +44,7 @@ fun CurrentConditionsPresentation(
             LeftRightText(left = "Wind: ", right = input.wind)
             LeftRightText(left = "Cloud cover: ", right = input.cloudCover.toString())
             LeftRightText(left = "Pressure: ", right = input.pressure)
-            Text(text = "Updates as of ${input.datetime}")
+            Text(text = "Updates as of ${parseDate(input.datetime)}")
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -64,8 +64,7 @@ fun CurrentConditionsPresentation(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Button(onClick = {
-                        NavigationUtils.navigateToWithArguments(
-                            navController,
+                        navController.navigateToWithArguments(
                             Screens.AppScreens.HourlyForecastScreen.route,
                             it.cityID.toString()
                         )
@@ -73,8 +72,7 @@ fun CurrentConditionsPresentation(
                         Text("12h Forecast")
                     }
                     Button(onClick = {
-                        NavigationUtils.navigateToWithArguments(
-                            navController,
+                        navController.navigateToWithArguments(
                             Screens.AppScreens.DailyForecastScreen.route,
                             it.cityID.toString()
                         )

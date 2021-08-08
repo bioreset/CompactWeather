@@ -1,10 +1,7 @@
 package com.dariusz.compactweather.presentation.screens.home
 
-import android.content.Context
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.dariusz.compactweather.domain.model.CurrentConditions
@@ -13,27 +10,21 @@ import com.dariusz.compactweather.domain.model.SavedCity
 import com.dariusz.compactweather.presentation.MainViewModel
 import com.dariusz.compactweather.presentation.components.common.CurrentConditionsPresentation
 import com.dariusz.compactweather.presentation.components.common.LoadingComponent
+import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStateOnScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
 
 @ExperimentalCoroutinesApi
 @Composable
 fun HomeScreen(
-    homeScreenViewModel: HomeScreenViewModel = viewModel(),
-    mainViewModel: MainViewModel = viewModel(),
-    currentContext: Context,
+    homeScreenViewModel: HomeScreenViewModel,
+    mainViewModel: MainViewModel,
     navController: NavController
 ) {
 
-    mainViewModel.getLocationData(currentContext)
 
-    val lifecycleOwnerScope = LocalLifecycleOwner.current.lifecycleScope
-
-    LaunchedEffect(lifecycleOwnerScope.coroutineContext) {
-        mainViewModel.currentLocation.collect {
-            homeScreenViewModel.manageCities(it)
-        }
-    }
+    val currentLocation by remember(mainViewModel) {
+        mainViewModel.currentLocation
+    }.collectAsState()
 
     val savedCitiesListFinal by remember(homeScreenViewModel) {
         homeScreenViewModel.listOfSavedCities
@@ -49,6 +40,13 @@ fun HomeScreen(
         inputTwo = currentConditionsFinal,
         navController = navController
     )
+
+    ManageDataStateOnScreen(currentLocation) { location ->
+        LaunchedEffect(Unit) {
+            homeScreenViewModel.manageCities(location)
+        }
+    }
+
 
 }
 

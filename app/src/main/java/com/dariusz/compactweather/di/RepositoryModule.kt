@@ -1,47 +1,67 @@
 package com.dariusz.compactweather.di
 
 import android.content.Context
-import com.dariusz.compactweather.di.DatabaseModule.provideCurrentConditionsDAO
-import com.dariusz.compactweather.di.DatabaseModule.provideDailyForecastDAO
-import com.dariusz.compactweather.di.DatabaseModule.provideHourlyForecastDAO
-import com.dariusz.compactweather.di.DatabaseModule.provideSavedCitiesDAO
-import com.dariusz.compactweather.di.NetworkModule.provideRetrofitService
+import com.dariusz.compactweather.data.local.sensors.CurrentLocationCheckImpl
+import com.dariusz.compactweather.data.local.sensors.GPSStateCheckImpl
+import com.dariusz.compactweather.data.local.sensors.NetworkStateCheckImpl
+import com.dariusz.compactweather.data.local.sensors.PermissionsCheckImpl
+import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiServiceImpl
+import com.dariusz.compactweather.di.DatabaseModule.buildDatabase
 import com.dariusz.compactweather.domain.repository.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
     @Provides
-    fun getSavedCityRepository(@ApplicationContext context: Context): SavedCityRepository =
+    fun provideSavedCityRepository(@ApplicationContext context: Context): SavedCityRepository =
         SavedCityRepositoryImpl(
-            provideRetrofitService(),
-            provideSavedCitiesDAO(context)
+            CompactWeatherApiServiceImpl(),
+            buildDatabase(context).savedCitiesDao()
         )
 
     @Provides
-    fun getCurrentConditionsRepository(@ApplicationContext context: Context): CurrentConditionsRepository =
+    fun provideCurrentConditionsRepository(@ApplicationContext context: Context): CurrentConditionsRepository =
         CurrentConditionsRepositoryImpl(
-            provideRetrofitService(),
-            provideCurrentConditionsDAO(context)
+            CompactWeatherApiServiceImpl(),
+            buildDatabase(context).currentConditionsDao()
         )
 
     @Provides
-    fun getDailyForecastRepository(@ApplicationContext context: Context): DailyForecastRepository =
+    fun provideDailyForecastRepository(@ApplicationContext context: Context): DailyForecastRepository =
         DailyForecastRepositoryImpl(
-            provideRetrofitService(),
-            provideDailyForecastDAO(context)
+            CompactWeatherApiServiceImpl(),
+            buildDatabase(context).dailyForecastDao()
         )
 
     @Provides
-    fun getHourlyForecastRepository(@ApplicationContext context: Context): HourlyForecastRepository =
+    fun provideHourlyForecastRepository(@ApplicationContext context: Context): HourlyForecastRepository =
         HourlyForecastRepositoryImpl(
-            provideRetrofitService(),
-            provideHourlyForecastDAO(context)
+            CompactWeatherApiServiceImpl(),
+            buildDatabase(context).hourlyForecastDao()
         )
+
+    @Provides
+    @ExperimentalCoroutinesApi
+    fun provideCurrentLocationRepository(@ApplicationContext context: Context): CurrentLocationRepository =
+        CurrentLocationRepositoryImpl(
+            CurrentLocationCheckImpl(context)
+        )
+
+    @ExperimentalCoroutinesApi
+    @Provides
+    fun provideRequirementsRepository(@ApplicationContext context: Context): RequirementsRepository =
+        RequirementsRepositoryImpl(
+            GPSStateCheckImpl(context),
+            NetworkStateCheckImpl(context),
+            PermissionsCheckImpl(context)
+        )
+
+
 }

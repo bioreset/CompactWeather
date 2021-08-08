@@ -1,7 +1,5 @@
 package com.dariusz.compactweather.presentation.components.common
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,9 +17,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.dariusz.compactweather.domain.model.DailyForecast
 import com.dariusz.compactweather.domain.model.HourlyForecast
+import com.dariusz.compactweather.utils.DateTimeUtils.parseDate
 import com.dariusz.compactweather.utils.MobileLinkUtils.openLinkInBrowser
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
     val currentContext = LocalContext.current
@@ -47,8 +45,7 @@ fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
                 LeftRightText("Rain: ", item.rain)
                 LeftRightText("Snow: ", item.snow)
                 LeftRightText("Cloud cover: ", item.cloudCover.toString())
-                LeftRightText("Link: ", item.mobileLink)
-                LeftRightText("Updates as of: ", item.dateTime)
+                LeftRightText("Updates as of: ", parseDate(item.dateTime))
 
                 Button(onClick = {
                     openLinkInBrowser(currentContext, item.mobileLink)
@@ -60,7 +57,6 @@ fun ScrollableHourlyForecast(hourlyForecast: List<HourlyForecast>) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScrollableDailyForecast(dailyForecast: List<DailyForecast>) {
     val currentContext = LocalContext.current
@@ -110,8 +106,7 @@ fun ScrollableDailyForecast(dailyForecast: List<DailyForecast>) {
                     LeftRightText("Cloud cover: ", it.cloudCover.toString())
                 }
 
-                LeftRightText("Mobile Link: ", item.mobileLink)
-                LeftRightText("Updated as of: ", item.dateTime)
+                LeftRightText("Updated as of: ", parseDate(item.dateTime))
 
                 Button(onClick = {
                     openLinkInBrowser(currentContext, item.mobileLink)

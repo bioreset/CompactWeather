@@ -1,13 +1,14 @@
 package com.dariusz.compactweather.presentation.screens.dailyforecast
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.dariusz.compactweather.domain.model.DailyForecast
 import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.domain.repository.DailyForecastRepository
+import com.dariusz.compactweather.utils.ViewModelUtils.launchVMTask
+import com.dariusz.compactweather.utils.ViewModelUtils.manageResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -17,16 +18,14 @@ constructor(
     private val dailyForecastRepository: DailyForecastRepository
 ) : ViewModel() {
 
-    private val _dailyForecast = MutableStateFlow<DataState<List<DailyForecast>>>(DataState.Loading)
+    private val _dailyForecast = MutableStateFlow<DataState<List<DailyForecast>>>(DataState.Idle)
     val dailyForecast: StateFlow<DataState<List<DailyForecast>>> = _dailyForecast
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), DataState.Loading)
 
-    fun fetchDailyForecast(cityID: String) = viewModelScope.launch {
-        dailyForecastRepository
-            .getFinalFiveDayForecast(cityID)
-            .collect {
-                _dailyForecast.value = it
-            }
+    fun fetchDailyForecast(cityID: String) = launchVMTask {
+        manageResult(
+            _dailyForecast,
+            dailyForecastRepository.getFinalFiveDayForecast(cityID)
+        )
     }
 
 }

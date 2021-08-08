@@ -5,16 +5,11 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import com.dariusz.compactweather.domain.model.PermissionsState
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 interface PermissionsCheck {
 
-    val currentPermissionStatus: Flow<PermissionsState>
+    val currentPermissionStatus: PermissionsState
 
 }
 
@@ -24,16 +19,11 @@ constructor(
     context: Context
 ) : PermissionsCheck {
 
-    override val currentPermissionStatus: Flow<PermissionsState> =
-        context.livePermissionsStatus().shareIn(MainScope(), SharingStarted.WhileSubscribed())
+    override val currentPermissionStatus: PermissionsState =
+        context.livePermissionsStatus()
 
-    private fun Context.livePermissionsStatus(): Flow<PermissionsState> {
-        val permissionStatus =
-            handlePermissionCheck(checkPermissions(applicationContext, mandatoryPermissions))
-        return flow {
-            emit(permissionStatus)
-        }
-    }
+    private fun Context.livePermissionsStatus(): PermissionsState =
+        handlePermissionCheck(checkPermissions(applicationContext, mandatoryPermissions))
 
     private fun handlePermissionCheck(status: Boolean): PermissionsState {
         return if (status)

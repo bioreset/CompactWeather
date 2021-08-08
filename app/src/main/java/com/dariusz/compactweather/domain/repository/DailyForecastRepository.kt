@@ -4,14 +4,12 @@ import com.dariusz.compactweather.data.local.db.dao.DailyForecastDao
 import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiService
 import com.dariusz.compactweather.domain.model.DailyForecast
 import com.dariusz.compactweather.domain.model.DailyForecast.Companion.dailyForecastsToDB
-import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.utils.NetworkBoundResource.networkBoundResource
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface DailyForecastRepository {
 
-    suspend fun getFinalFiveDayForecast(key: String): Flow<DataState<List<DailyForecast>>>
+    suspend fun getFinalFiveDayForecast(key: String): List<DailyForecast>
 
 }
 
@@ -21,7 +19,7 @@ class DailyForecastRepositoryImpl
     private val dailyForecastDao: DailyForecastDao
 ) : DailyForecastRepository {
 
-    override suspend fun getFinalFiveDayForecast(key: String): Flow<DataState<List<DailyForecast>>> =
+    override suspend fun getFinalFiveDayForecast(key: String): List<DailyForecast> =
         networkBoundResource(
             dataFromNetwork = getFiveDayForecast(key),
             insertDataFromNetworkToDB = { insertFiveDayForecast(dailyForecastsToDB(it)) },

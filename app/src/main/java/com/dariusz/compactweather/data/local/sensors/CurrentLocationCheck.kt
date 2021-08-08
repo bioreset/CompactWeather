@@ -7,13 +7,13 @@ import android.os.Looper
 import com.dariusz.compactweather.domain.model.CurrentLocation
 import com.google.android.gms.location.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 interface CurrentLocationCheck {
 
-    suspend fun getCurrentLocation(): Flow<CurrentLocation>
+    suspend fun getCurrentLocation(): CurrentLocation
 
 }
 
@@ -24,14 +24,14 @@ class CurrentLocationCheckImpl
     private val context: Context
 ) : CurrentLocationCheck {
 
-    override suspend fun getCurrentLocation(): Flow<CurrentLocation> {
+    override suspend fun getCurrentLocation(): CurrentLocation {
         val fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(context)
-        return fusedLocationProviderClient.getCurrentLocationAsFlow()
+        return fusedLocationProviderClient.getCurrentLocationNow()
     }
 
-    private suspend fun FusedLocationProviderClient.getCurrentLocationAsFlow(): Flow<CurrentLocation> =
-        callbackFlow {
+    private suspend fun FusedLocationProviderClient.getCurrentLocationNow(): CurrentLocation =
+        suspendCancellableCoroutine { continuation ->
             val locationRequest: LocationRequest = LocationRequest.create()
                 .apply {
                     interval = 1000L
@@ -42,7 +42,7 @@ class CurrentLocationCheckImpl
                 override fun onLocationResult(locationResult: LocationResult?) {
                     locationResult ?: return
                     for (location in locationResult.locations) {
-                        this@callbackFlow.trySend(setLocationData(location)).isSuccess
+                        continuation.resume(setLocationData(location))
                     }
                 }
             }
@@ -51,7 +51,7 @@ class CurrentLocationCheckImpl
                 locationCallback,
                 Looper.getMainLooper()
             )
-            awaitClose {
+            continuation.invokeOnCancellation {
                 removeLocationUpdates(locationCallback)
             }
         }

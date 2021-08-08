@@ -1,21 +1,15 @@
 package com.dariusz.compactweather.presentation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.dariusz.compactweather.di.SensorDataModule.provideCurrentLocationCheck
-import com.dariusz.compactweather.di.SensorDataModule.provideGpsStateCheck
-import com.dariusz.compactweather.di.SensorDataModule.provideNetworkStateCheck
-import com.dariusz.compactweather.di.SensorDataModule.providePermissionStateCheck
-import com.dariusz.compactweather.domain.model.CurrentLocation
-import com.dariusz.compactweather.domain.model.GpsState
-import com.dariusz.compactweather.domain.model.NetworkState
-import com.dariusz.compactweather.domain.model.PermissionsState
+import com.dariusz.compactweather.domain.model.*
+import com.dariusz.compactweather.domain.repository.CurrentLocationRepository
+import com.dariusz.compactweather.domain.repository.RequirementsRepository
+import com.dariusz.compactweather.utils.ViewModelUtils.launchVMTask
+import com.dariusz.compactweather.utils.ViewModelUtils.manageResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,48 +17,54 @@ import javax.inject.Inject
 class MainViewModel
 @Inject
 constructor(
+    private val currentLocationRepository: CurrentLocationRepository,
+    private val requirementsRepository: RequirementsRepository
 ) : ViewModel() {
 
-    private var _currentLocation = MutableSharedFlow<CurrentLocation>(
-        replay = 1, onBufferOverflow = BufferOverflow.DROP_LATEST
-    )
-    val currentLocation: SharedFlow<CurrentLocation> = _currentLocation
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
+    private var _currentLocation = MutableStateFlow<DataState<CurrentLocation>>(DataState.Idle)
+    val currentLocation: StateFlow<DataState<CurrentLocation>> = _currentLocation
 
-    private var _networkState = MutableStateFlow(NetworkState())
-    val networkState: StateFlow<NetworkState> = _networkState
+    private var _networkState = MutableStateFlow<DataState<NetworkState>>(DataState.Idle)
+    val networkState: StateFlow<DataState<NetworkState>> = _networkState
 
-    private val _gpsStatus = MutableStateFlow(GpsState())
-    val gpsStatus: StateFlow<GpsState> = _gpsStatus
+    private val _gpsStatus = MutableStateFlow<DataState<GpsState>>(DataState.Idle)
+    val gpsStatus: StateFlow<DataState<GpsState>> = _gpsStatus
 
-    private val _permissionsStatus = MutableStateFlow(PermissionsState())
-    val permissionsStatus: StateFlow<PermissionsState> = _permissionsStatus
+    private val _permissionsStatus = MutableStateFlow<DataState<PermissionsState>>(DataState.Idle)
+    val permissionsStatus: StateFlow<DataState<PermissionsState>> = _permissionsStatus
 
-    fun getLocationData(context: Context) = viewModelScope.launch {
-        _currentLocation.emitAll(provideCurrentLocationCheck(context).getCurrentLocation())
+    init {
+        getLocationData()
+        getNetworkState()
+        getGpsState()
+        getPermissionState()
     }
 
-    fun getNetworkState(context: Context) = viewModelScope.launch {
-        provideNetworkStateCheck(context)
-            .currentNetworkStatus
-            .collect {
-                _networkState.value = it
-            }
+    private fun getLocationData() = launchVMTask {
+        manageResult(
+            _currentLocation,
+            currentLocationRepository.getCurrentLocation()
+        )
     }
 
-    fun getGpsState(context: Context) = viewModelScope.launch {
-        provideGpsStateCheck(context)
-            .currentGpsStatus
-            .collect {
-                _gpsStatus.value = it
-            }
+    private fun getNetworkState() = launchVMTask {
+        manageResult(
+            _networkState,
+            requirementsRepository.checkNetworkState()
+        )
     }
 
-    fun getPermissionState(context: Context) = viewModelScope.launch {
-        providePermissionStateCheck(context)
-            .currentPermissionStatus
-            .collect {
-                _permissionsStatus.value = it
-            }
+    private fun getGpsState() = launchVMTask {
+        manageResult(
+            _gpsStatus,
+            requirementsRepository.checkGpsState()
+        )
+    }
+
+    private fun getPermissionState() = launchVMTask {
+        manageResult(
+            _permissionsStatus,
+            requirementsRepository.checkPermissionsState()
+        )
     }
 }

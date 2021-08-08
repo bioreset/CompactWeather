@@ -9,32 +9,45 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dariusz.compactweather.presentation.MainViewModel
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
+import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStateOnScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.properties.Delegates
 
 @ExperimentalCoroutinesApi
 @Composable
-fun MainAlertBox(mainViewModel: MainViewModel = viewModel(), currentContext: Context) {
+fun MainAlertBox(mainViewModel: MainViewModel) {
 
-    mainViewModel.getNetworkState(currentContext)
-    mainViewModel.getGpsState(currentContext)
-    mainViewModel.getPermissionState(currentContext)
+    val currentContext = LocalContext.current
 
-    val currentGPSStatus = mainViewModel.gpsStatus.collectAsState()
-    val currentWifiStatus = mainViewModel.networkState.collectAsState()
-    val currentPermissionsStatus = mainViewModel.permissionsStatus.collectAsState()
+    val currentGPSStatus by remember(mainViewModel) {
+        mainViewModel.gpsStatus
+    }.collectAsState()
 
-    if (currentGPSStatus.value.state == false) GpsAlert(currentContext)
-    if (currentWifiStatus.value.state == false) WifiAlert(currentContext)
-    if (currentPermissionsStatus.value.state == false) PermissionsAlert(currentContext)
+    val currentWifiStatus by remember(mainViewModel) {
+        mainViewModel.networkState
+    }.collectAsState()
+
+    val currentPermissionsStatus by remember(mainViewModel) {
+        mainViewModel.permissionsStatus
+    }.collectAsState()
+
+    ManageDataStateOnScreen(currentGPSStatus) {
+        if (it.state == false) GpsAlert(currentContext)
+    }
+
+    ManageDataStateOnScreen(currentWifiStatus) {
+        if (it.state == false) WifiAlert(currentContext)
+    }
+
+    ManageDataStateOnScreen(currentPermissionsStatus) {
+        if (it.state == false) PermissionsAlert(currentContext)
+    }
+
 }
 
 @Composable

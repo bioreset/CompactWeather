@@ -10,7 +10,6 @@ import com.dariusz.compactweather.domain.model.CurrentConditions
 import com.dariusz.compactweather.domain.model.DailyForecast
 import com.dariusz.compactweather.domain.model.HourlyForecast
 import com.dariusz.compactweather.domain.model.SavedCity
-
 import com.dariusz.compactweather.utils.Constants.DB_VERSION
 
 @Database(

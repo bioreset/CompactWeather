@@ -1,6 +1,6 @@
 package com.dariusz.compactweather.data.source.remote.api
 
-import com.dariusz.compactweather.di.NetworkModule
+import com.dariusz.compactweather.di.NetworkModule.provideRetrofit
 import com.dariusz.compactweather.domain.model.CurrentConditionsJson
 import com.dariusz.compactweather.domain.model.DailyForecastResponse
 import com.dariusz.compactweather.domain.model.HourlyForecastJson
@@ -20,7 +20,7 @@ interface CompactWeatherApiService {
 
 class CompactWeatherApiServiceImpl : CompactWeatherApiService {
 
-    private val retrofit = NetworkModule.provideRetrofit()
+    private val retrofit = provideRetrofit()
 
     override suspend fun getCityKeyBasedOnLocation(q: String): SavedCity =
         retrofit.getCityKeyBasedOnLocation(q)
