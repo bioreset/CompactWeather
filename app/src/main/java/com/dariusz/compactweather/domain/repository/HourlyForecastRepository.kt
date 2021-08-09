@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 interface HourlyForecastRepository {
 
-    suspend fun getFinalTwentyFourHourForecast(key: String): List<HourlyForecast>
+    suspend fun getFinalTwelveHourForecast(key: String): List<HourlyForecast>
 
 }
 
@@ -19,15 +19,15 @@ class HourlyForecastRepositoryImpl
     private val hourlyForecastDao: HourlyForecastDao
 ) : HourlyForecastRepository {
 
-    override suspend fun getFinalTwentyFourHourForecast(key: String): List<HourlyForecast> =
+    override suspend fun getFinalTwelveHourForecast(key: String): List<HourlyForecast> =
         networkBoundResource(
-            dataFromNetwork = getTwentyFourHourForecast(key),
+            dataFromNetwork = getTwelveHourForecast(key),
             insertDataFromNetworkToDB = { insertTwelveFourHourForecast(hourlyForecastsToDB(it)) },
             selectFetchedData = getTwelveFourHourForecastFromDB()
         )
 
-    private suspend fun getTwentyFourHourForecast(key: String) =
-        compactWeatherApiService.getTwentyFourHourForecast(key)
+    private suspend fun getTwelveHourForecast(key: String) =
+        compactWeatherApiService.getTwelveHourForecast(key)
 
     private suspend fun insertTwelveFourHourForecast(inputData: List<HourlyForecast>) {
         hourlyForecastDao.deleteAllHourlyForecasts()

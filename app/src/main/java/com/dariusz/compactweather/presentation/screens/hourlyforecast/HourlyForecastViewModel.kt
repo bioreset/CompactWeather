@@ -25,7 +25,7 @@ constructor(
     fun fetchHourlyForecast(cityID: String) = launchVMTask {
         manageResult(
             _hourlyForecast,
-            hourlyForecastRepository.getFinalTwentyFourHourForecast(cityID)
+            hourlyForecastRepository.getFinalTwelveHourForecast(cityID)
         )
     }
 

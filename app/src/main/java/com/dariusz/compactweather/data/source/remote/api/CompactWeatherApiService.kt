@@ -12,7 +12,7 @@ interface CompactWeatherApiService {
 
     suspend fun getCurrentWeather(key: String): List<CurrentConditionsJson>
 
-    suspend fun getTwentyFourHourForecast(key: String): List<HourlyForecastJson>
+    suspend fun getTwelveHourForecast(key: String): List<HourlyForecastJson>
 
     suspend fun getFiveDayForecast(key: String): DailyForecastResponse
 
@@ -28,8 +28,8 @@ class CompactWeatherApiServiceImpl : CompactWeatherApiService {
     override suspend fun getCurrentWeather(key: String): List<CurrentConditionsJson> =
         retrofit.getCurrentWeather(key)
 
-    override suspend fun getTwentyFourHourForecast(key: String): List<HourlyForecastJson> =
-        retrofit.getTwentyFourHourForecast(key)
+    override suspend fun getTwelveHourForecast(key: String): List<HourlyForecastJson> =
+        retrofit.getTwelveHourForecast(key)
 
     override suspend fun getFiveDayForecast(key: String): DailyForecastResponse =
         retrofit.getFiveDayForecast(key)

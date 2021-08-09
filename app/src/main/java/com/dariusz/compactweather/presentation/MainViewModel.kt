@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import com.dariusz.compactweather.domain.model.*
 import com.dariusz.compactweather.domain.repository.CurrentLocationRepository
 import com.dariusz.compactweather.domain.repository.RequirementsRepository
+import com.dariusz.compactweather.utils.ViewModelUtils.collectLatestState
 import com.dariusz.compactweather.utils.ViewModelUtils.launchVMTask
 import com.dariusz.compactweather.utils.ViewModelUtils.manageResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -33,35 +35,28 @@ constructor(
     private val _permissionsStatus = MutableStateFlow<DataState<PermissionsState>>(DataState.Idle)
     val permissionsStatus: StateFlow<DataState<PermissionsState>> = _permissionsStatus
 
-    init {
-        getLocationData()
-        getNetworkState()
-        getGpsState()
-        getPermissionState()
+    @InternalCoroutinesApi
+    fun getLocationData() = launchVMTask {
+        currentLocationRepository
+            .getCurrentLocation()
+            .collectLatestState(_currentLocation)
     }
 
-    private fun getLocationData() = launchVMTask {
-        manageResult(
-            _currentLocation,
-            currentLocationRepository.getCurrentLocation()
-        )
-    }
-
-    private fun getNetworkState() = launchVMTask {
+    fun getNetworkState() = launchVMTask {
         manageResult(
             _networkState,
             requirementsRepository.checkNetworkState()
         )
     }
 
-    private fun getGpsState() = launchVMTask {
+    fun getGpsState() = launchVMTask {
         manageResult(
             _gpsStatus,
             requirementsRepository.checkGpsState()
         )
     }
 
-    private fun getPermissionState() = launchVMTask {
+    fun getPermissionState() = launchVMTask {
         manageResult(
             _permissionsStatus,
             requirementsRepository.checkPermissionsState()

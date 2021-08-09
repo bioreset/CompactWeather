@@ -2,7 +2,6 @@ package com.dariusz.compactweather.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
 import com.dariusz.compactweather.domain.model.CurrentConditions
-import com.dariusz.compactweather.domain.model.CurrentLocation
 import com.dariusz.compactweather.domain.model.DataState
 import com.dariusz.compactweather.domain.model.SavedCity
 import com.dariusz.compactweather.domain.repository.CurrentConditionsRepository
@@ -22,25 +21,25 @@ constructor(
     private val savedCityRepository: SavedCityRepository
 ) : ViewModel() {
 
-    private val _listOfSavedCities =
-        MutableStateFlow<DataState<List<SavedCity>>>(DataState.Idle)
-    val listOfSavedCities: StateFlow<DataState<List<SavedCity>>> = _listOfSavedCities
-
     private val _currentConditions =
         MutableStateFlow<DataState<List<CurrentConditions>>>(DataState.Idle)
     val currentConditions: StateFlow<DataState<List<CurrentConditions>>> = _currentConditions
 
-    fun manageCities(location: CurrentLocation) = launchVMTask {
-        manageResult(
-            _listOfSavedCities,
-            savedCityRepository.manageCities(location)
-        )
-    }
+    private val _listOfSavedCities =
+        MutableStateFlow<DataState<List<SavedCity>>>(DataState.Idle)
+    val listOfSavedCities: StateFlow<DataState<List<SavedCity>>> = _listOfSavedCities
 
     fun getCurrentConditions(cityID: String) = launchVMTask {
         manageResult(
             _currentConditions,
             currentConditionsRepository.getCurrentConditionsData(cityID)
+        )
+    }
+
+    fun getCitiesID() = launchVMTask {
+        manageResult(
+            _listOfSavedCities,
+            savedCityRepository.getSavedCities()
         )
     }
 

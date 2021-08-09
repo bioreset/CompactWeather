@@ -12,17 +12,27 @@ import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import com.dariusz.compactweather.di.RepositoryModule.provideCurrentLocationRepository
+import com.dariusz.compactweather.di.RepositoryModule.provideRequirementsRepository
 import com.dariusz.compactweather.presentation.MainViewModel
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
 import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStateOnScreen
+import com.dariusz.compactweather.utils.ViewModelUtils.composeViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.properties.Delegates
 
 @ExperimentalCoroutinesApi
 @Composable
-fun MainAlertBox(mainViewModel: MainViewModel) {
+fun MainAlertBox() {
 
     val currentContext = LocalContext.current
+
+    val mainViewModel = composeViewModel {
+        MainViewModel(
+            provideCurrentLocationRepository(currentContext),
+            provideRequirementsRepository(currentContext)
+        )
+    }
 
     val currentGPSStatus by remember(mainViewModel) {
         mainViewModel.gpsStatus
@@ -46,6 +56,14 @@ fun MainAlertBox(mainViewModel: MainViewModel) {
 
     ManageDataStateOnScreen(currentPermissionsStatus) {
         if (it.state == false) PermissionsAlert(currentContext)
+    }
+
+    LaunchedEffect(Unit) {
+        mainViewModel.apply {
+            getGpsState()
+            getNetworkState()
+            getPermissionState()
+        }
     }
 
 }

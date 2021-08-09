@@ -19,11 +19,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
-import kotlinx.coroutines.Job
 import kotlin.properties.Delegates
 
 @Composable
-fun LaunchButton(action: () -> Job) {
+fun LaunchButton(action: () -> Unit) {
     val currentContext = LocalContext.current
     val permissionsState = remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(

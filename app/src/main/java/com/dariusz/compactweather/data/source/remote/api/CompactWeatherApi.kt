@@ -26,8 +26,8 @@ interface CompactWeatherApi {
         @Query("apikey") apiKey: String = API_KEY
     ): List<CurrentConditionsJson>
 
-    @GET("forecasts/v1/hourly/24hour/{locationkey}")
-    suspend fun getTwentyFourHourForecast(
+    @GET("forecasts/v1/hourly/12hour/{locationkey}")
+    suspend fun getTwelveHourForecast(
         @Path("locationkey") key: String,
         @Query("details") details: Boolean = true,
         @Query("apikey") apiKey: String = API_KEY,

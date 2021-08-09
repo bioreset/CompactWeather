@@ -28,4 +28,39 @@ object DataStateUtils {
         }
     }
 
+
+    @Composable
+    fun <T, R> ManageDataStatesOnScreen(
+        inputOne: DataState<T>,
+        inputTwo: DataState<R>,
+        content: @Composable (T, R) -> Unit,
+    ) {
+        when (inputOne) {
+            is DataState.Loading -> {
+                LoadingComponent()
+            }
+            is DataState.Success -> {
+                when (inputTwo) {
+                    is DataState.Loading -> {
+                        LoadingComponent()
+                    }
+                    is DataState.Success -> {
+                        content.invoke(inputOne.data, inputTwo.data)
+                    }
+                    is DataState.Error -> {
+                        CenteredText("Error: ${inputTwo.exception}")
+                    }
+                    is DataState.Idle -> {
+                        //default option; do nothing
+                    }
+                }
+            }
+            is DataState.Error -> {
+                CenteredText("Error: ${inputOne.exception}")
+            }
+            is DataState.Idle -> {
+                //default option; do nothing
+            }
+        }
+    }
 }

@@ -10,10 +10,9 @@ object NavigationUtils {
     ) {
         navigate(screenRoute.plus("/$argument")) {
             graph.startDestinationRoute?.let { route ->
-                popUpTo(route) {
-                    saveState = true
-                }
+                popUpTo(route)
             }
+            restoreState = true
             launchSingleTop = true
         }
     }

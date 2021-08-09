@@ -11,6 +11,7 @@ interface SavedCityRepository {
 
     suspend fun manageCities(location: CurrentLocation): List<SavedCity>
 
+    suspend fun getSavedCities(): List<SavedCity>
 }
 
 class SavedCityRepositoryImpl
@@ -23,7 +24,7 @@ class SavedCityRepositoryImpl
         networkBoundResource(
             dataFromNetwork = fetchCityBasedOnLocation(location),
             insertDataFromNetworkToDB = { insertCity(it) },
-            selectFetchedData = getSavedCity()
+            selectFetchedData = getSavedCities()
         )
 
     private suspend fun fetchCityBasedOnLocation(location: CurrentLocation) =
@@ -37,7 +38,7 @@ class SavedCityRepositoryImpl
     private suspend fun checkIfCityAlreadyExists(inputCity: SavedCity) =
         savedCityDao.checkIfCityAlreadyExists(inputCity.cityID) > 0
 
-    private suspend fun getSavedCity() =
+    override suspend fun getSavedCities() =
         savedCityDao.getAllSavedCities()
 
 }

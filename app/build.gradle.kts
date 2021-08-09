@@ -13,8 +13,8 @@ android {
         applicationId = "com.dariusz.compactweather"
         minSdk = 26
         targetSdk = 30
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 17
+        versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -65,6 +65,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
 
     implementation("com.google.dagger:hilt-android:2.38.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.0")
     kapt("com.google.dagger:hilt-android-compiler:2.38.1")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
