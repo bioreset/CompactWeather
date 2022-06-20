@@ -1,37 +1,27 @@
 package com.dariusz.compactweather.presentation.screens.dailyforecast
 
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import com.dariusz.compactweather.di.RepositoryModule.provideDailyForecastRepository
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.dariusz.compactweather.presentation.components.common.ScrollableDailyForecast
-import com.dariusz.compactweather.presentation.components.theme.ThemeTypography
-import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStateOnScreen
-import com.dariusz.compactweather.utils.ScreenUtils.ShowScreen
+import com.dariusz.compactweather.utils.ResultUtils.showOnScreen
 
 @Composable
 fun DailyForecastScreen(
-    cityKey: String
+    cityKey: String,
+    dailyForecastViewModel: DailyForecastViewModel = hiltViewModel()
 ) {
 
-    ShowScreen(
-        viewModel = { context ->
-            DailyForecastViewModel(
-                provideDailyForecastRepository(context)
-            )
-        },
-        data = { viewModel ->
-            viewModel.dailyForecast
-        },
-        composable = { dataState ->
-            Text(text = "Daily Forecast", style = ThemeTypography.h5)
-            ManageDataStateOnScreen(dataState) {
-                ScrollableDailyForecast(it)
-            }
-        },
-        launchedEffect = { viewModel ->
-            viewModel.fetchDailyForecast(cityKey)
-        }
-    )
+    val dailyForecast = dailyForecastViewModel.dailyForecast.collectAsState()
+
+    dailyForecast.showOnScreen {
+        ScrollableDailyForecast(it)
+    }
+
+    LaunchedEffect(Unit) {
+        dailyForecastViewModel.fetchDailyForecast(cityKey)
+    }
 
 }
 

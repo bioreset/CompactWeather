@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,7 +22,7 @@ import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
 import kotlin.properties.Delegates
 
 @Composable
-fun LaunchButton(action: () -> Unit) {
+fun LaunchButton(city: String, action: () -> Unit) {
     val currentContext = LocalContext.current
     val permissionsState = remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(
@@ -30,6 +30,7 @@ fun LaunchButton(action: () -> Unit) {
     ) { isGranted ->
         permissionsState.value = isGranted.containsValue(true)
     }
+    val currentCity = remember { city.ifEmpty { "your location" } }
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -39,7 +40,7 @@ fun LaunchButton(action: () -> Unit) {
                 onClick = {
                     when (isPermissionGranted(currentContext) && permissionsState.value) {
                         true -> {
-                            action.invoke()
+                            action()
                         }
                         else -> {
                             launcher.launch(mandatoryPermissions.toTypedArray())
@@ -49,7 +50,7 @@ fun LaunchButton(action: () -> Unit) {
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Check weather in your location",
+                    text = "Check weather in $currentCity",
                     modifier = Modifier.padding(16.dp)
                 )
             }

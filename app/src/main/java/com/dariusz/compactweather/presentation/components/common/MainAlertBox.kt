@@ -6,67 +6,76 @@ import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
-import com.dariusz.compactweather.di.RepositoryModule.provideCurrentLocationRepository
-import com.dariusz.compactweather.di.RepositoryModule.provideRequirementsRepository
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.dariusz.compactweather.domain.model.GpsState
+import com.dariusz.compactweather.domain.model.NetworkState
+import com.dariusz.compactweather.domain.model.PermissionsState
 import com.dariusz.compactweather.presentation.MainViewModel
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
-import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStateOnScreen
-import com.dariusz.compactweather.utils.ViewModelUtils.composeViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlin.properties.Delegates
 
-@ExperimentalCoroutinesApi
 @Composable
-fun MainAlertBox() {
-
+fun MainAlertBox(
+    onAllGranted: @Composable () -> Unit
+) {
     val currentContext = LocalContext.current
 
-    val mainViewModel = composeViewModel {
-        MainViewModel(
-            provideCurrentLocationRepository(currentContext),
-            provideRequirementsRepository(currentContext)
+    val viewModel: MainViewModel = hiltViewModel()
+
+    val requirementsStatus by viewModel.requirementsStatus.collectAsState()
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        ShowAlerts(
+            context = currentContext,
+            gpsStatusModel = requirementsStatus.gpsStatusModel,
+            wifiStatusModel = requirementsStatus.wifiStatusModel,
+            permissionStatusModel = requirementsStatus.permissionStatusModel,
+            defaultView = {
+                CenteredText("Grant all needed permissions")
+            },
+            onAllGranted = {
+                onAllGranted()
+            }
         )
     }
+}
 
-    val currentGPSStatus by remember(mainViewModel) {
-        mainViewModel.gpsStatus
-    }.collectAsState()
+@Composable
+fun ShowAlerts(
+    context: Context,
+    gpsStatusModel: GpsState,
+    wifiStatusModel: NetworkState,
+    permissionStatusModel: PermissionsState,
+    defaultView: @Composable () -> Unit,
+    onAllGranted: @Composable () -> Unit
+) {
+    if (gpsStatusModel.state == false)
+        GpsAlert(context)
 
-    val currentWifiStatus by remember(mainViewModel) {
-        mainViewModel.networkState
-    }.collectAsState()
+    if (wifiStatusModel.state == false)
+        WifiAlert(context)
 
-    val currentPermissionsStatus by remember(mainViewModel) {
-        mainViewModel.permissionsStatus
-    }.collectAsState()
+    if (permissionStatusModel.state == false)
+        PermissionsAlert(context)
 
-    ManageDataStateOnScreen(currentGPSStatus) {
-        if (it.state == false) GpsAlert(currentContext)
-    }
-
-    ManageDataStateOnScreen(currentWifiStatus) {
-        if (it.state == false) WifiAlert(currentContext)
-    }
-
-    ManageDataStateOnScreen(currentPermissionsStatus) {
-        if (it.state == false) PermissionsAlert(currentContext)
-    }
-
-    LaunchedEffect(Unit) {
-        mainViewModel.apply {
-            getGpsState()
-            getNetworkState()
-            getPermissionState()
-        }
-    }
+    if (gpsStatusModel.state == true &&
+        wifiStatusModel.state == true &&
+        permissionStatusModel.state == true
+    ) onAllGranted()
+    else
+        defaultView()
 
 }
+
 
 @Composable
 fun WifiAlert(currentContext: Context) {

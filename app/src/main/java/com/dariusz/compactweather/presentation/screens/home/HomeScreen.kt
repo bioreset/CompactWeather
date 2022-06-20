@@ -1,59 +1,26 @@
 package com.dariusz.compactweather.presentation.screens.home
 
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.dariusz.compactweather.di.RepositoryModule.provideCurrentConditionsRepository
-import com.dariusz.compactweather.di.RepositoryModule.provideSavedCityRepository
 import com.dariusz.compactweather.presentation.components.common.CurrentConditionsPresentation
-import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStateOnScreen
-import com.dariusz.compactweather.utils.DataStateUtils.ManageDataStatesOnScreen
-import com.dariusz.compactweather.utils.ViewModelUtils.composeViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.dariusz.compactweather.utils.ResultUtils.showOnScreen
 
-@ExperimentalCoroutinesApi
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
+    homeScreenViewModel: HomeScreenViewModel = hiltViewModel()
 ) {
 
-    val currentContext = LocalContext.current
+    val homeScreenData = homeScreenViewModel.homeScreenData.collectAsState()
 
-    val homeScreenViewModel = composeViewModel {
-        HomeScreenViewModel(
-            provideCurrentConditionsRepository(currentContext),
-            provideSavedCityRepository(currentContext)
-        )
-    }
-
-    val savedCitiesListFinal by remember(homeScreenViewModel) {
-        homeScreenViewModel.listOfSavedCities
-    }.collectAsState()
-
-    val currentConditionsFinal by remember(homeScreenViewModel) {
-        homeScreenViewModel.currentConditions
-    }.collectAsState()
-
-    LaunchedEffect(Unit) {
-        homeScreenViewModel.getCitiesID()
-    }
-
-    ManageDataStateOnScreen(savedCitiesListFinal) {
-        LaunchedEffect(Unit) {
-            homeScreenViewModel.getCurrentConditions(it.first().cityID.toString())
-        }
-    }
-
-    ManageDataStatesOnScreen(
-        savedCitiesListFinal,
-        currentConditionsFinal
-    ) { savedCities, conditions ->
+    homeScreenData.showOnScreen {
         CurrentConditionsPresentation(
-            navController,
-            savedCities,
-            conditions.first()
+            navController = navController,
+            savedCity = it.savedCity,
+            input = it.currentConditions
         )
     }
-
 
 }

@@ -1,16 +1,15 @@
 package com.dariusz.compactweather.presentation.screens.home
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dariusz.compactweather.domain.model.CurrentConditions
-import com.dariusz.compactweather.domain.model.DataState
+import com.dariusz.compactweather.domain.model.Result
 import com.dariusz.compactweather.domain.model.SavedCity
 import com.dariusz.compactweather.domain.repository.CurrentConditionsRepository
 import com.dariusz.compactweather.domain.repository.SavedCityRepository
-import com.dariusz.compactweather.utils.ViewModelUtils.launchVMTask
-import com.dariusz.compactweather.utils.ViewModelUtils.manageResult
+import com.dariusz.compactweather.utils.ResultUtils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,26 +20,21 @@ constructor(
     private val savedCityRepository: SavedCityRepository
 ) : ViewModel() {
 
-    private val _currentConditions =
-        MutableStateFlow<DataState<List<CurrentConditions>>>(DataState.Idle)
-    val currentConditions: StateFlow<DataState<List<CurrentConditions>>> = _currentConditions
+    private var cityId: Flow<String> = savedCityRepository
+        .getSavedCities()
+        .map { it[0].cityID.toString() }
 
-    private val _listOfSavedCities =
-        MutableStateFlow<DataState<List<SavedCity>>>(DataState.Idle)
-    val listOfSavedCities: StateFlow<DataState<List<SavedCity>>> = _listOfSavedCities
-
-    fun getCurrentConditions(cityID: String) = launchVMTask {
-        manageResult(
-            _currentConditions,
-            currentConditionsRepository.getCurrentConditionsData(cityID)
-        )
+    val homeScreenData: StateFlow<Result<HomeScreenData>> = combine(
+        cityId.flatMapLatest { currentConditionsRepository.getCurrentConditionsData(it) },
+        savedCityRepository.getSavedCities().map { it[0] }
+    ) { currentConditions, savedCities ->
+        HomeScreenData(currentConditions, savedCities)
     }
-
-    fun getCitiesID() = launchVMTask {
-        manageResult(
-            _listOfSavedCities,
-            savedCityRepository.getSavedCities()
-        )
-    }
+        .asResult(viewModelScope)
 
 }
+
+data class HomeScreenData(
+    val currentConditions: CurrentConditions,
+    val savedCity: SavedCity
+)

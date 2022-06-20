@@ -1,21 +1,15 @@
 package com.dariusz.compactweather.domain.repository
 
 import com.dariusz.compactweather.data.local.sensors.CurrentLocationCheck
-import com.dariusz.compactweather.domain.model.CurrentLocation
-import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-interface CurrentLocationRepository {
-
-    suspend fun getCurrentLocation(): Flow<CurrentLocation>
-
-}
-
-class CurrentLocationRepositoryImpl
+@Singleton
+class CurrentLocationRepository
 @Inject constructor(
     private val currentLocationCheck: CurrentLocationCheck
-) : CurrentLocationRepository {
+) {
 
-    override suspend fun getCurrentLocation() = currentLocationCheck.getCurrentLocation()
+    fun getCurrentLocation() = currentLocationCheck.getCurrentLocation()
 
 }

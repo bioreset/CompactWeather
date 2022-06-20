@@ -5,17 +5,18 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.dariusz.compactweather.domain.model.CurrentConditions
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CurrentConditionsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll(currentConditions: List<CurrentConditions>)
+    suspend fun insert(currentConditions: CurrentConditions)
 
     @Query("DELETE FROM currentconditions;")
     suspend fun deleteAllCurrentConditions()
 
     @Query("SELECT * FROM currentconditions;")
-    suspend fun getAllCurrentConditions(): List<CurrentConditions>
+    fun getAllCurrentConditions(): Flow<CurrentConditions>
 
 }

@@ -6,32 +6,27 @@ import android.location.Location
 import android.os.Looper
 import com.dariusz.compactweather.domain.model.CurrentLocation
 import com.google.android.gms.location.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-interface CurrentLocationCheck {
-
-    suspend fun getCurrentLocation(): Flow<CurrentLocation>
-
-}
-
-@ExperimentalCoroutinesApi
+@Singleton
 @SuppressLint("MissingPermission")
-class CurrentLocationCheckImpl
+class CurrentLocationCheck
 @Inject constructor(
-    private val context: Context
-) : CurrentLocationCheck {
+    @ApplicationContext private val context: Context
+) {
 
-    override suspend fun getCurrentLocation(): Flow<CurrentLocation> {
+    fun getCurrentLocation(): Flow<CurrentLocation> {
         val fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(context)
         return fusedLocationProviderClient.getCurrentLocationNow()
     }
 
-    private suspend fun FusedLocationProviderClient.getCurrentLocationNow(): Flow<CurrentLocation> =
+    private fun FusedLocationProviderClient.getCurrentLocationNow(): Flow<CurrentLocation> =
         callbackFlow {
             val locationRequest: LocationRequest = LocationRequest.create()
                 .apply {
@@ -40,10 +35,9 @@ class CurrentLocationCheckImpl
                     priority = LocationRequest.PRIORITY_HIGH_ACCURACY
                 }
             val locationCallback = object : LocationCallback() {
-                override fun onLocationResult(locationResult: LocationResult?) {
-                    locationResult ?: return
-                    for (location in locationResult.locations) {
-                        trySend(setLocationData(location)).isSuccess
+                override fun onLocationResult(p0: LocationResult) {
+                    for (location in p0.locations) {
+                        trySend(setLocationData(location))
                     }
                 }
             }

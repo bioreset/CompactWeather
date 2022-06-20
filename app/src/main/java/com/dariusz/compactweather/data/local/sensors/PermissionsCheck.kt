@@ -5,22 +5,21 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import com.dariusz.compactweather.domain.model.PermissionsState
 import com.dariusz.compactweather.utils.Constants.mandatoryPermissions
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-interface PermissionsCheck {
-
-    val currentPermissionStatus: PermissionsState
-
-}
-
-class PermissionsCheckImpl
+@Singleton
+class PermissionsCheck
 @Inject
 constructor(
-    context: Context
-) : PermissionsCheck {
+    @ApplicationContext private val context: Context
+) {
 
-    override val currentPermissionStatus: PermissionsState =
-        context.livePermissionsStatus()
+    val currentPermissionStatus: Flow<PermissionsState> =
+        flow { emit(context.livePermissionsStatus()) }
 
     private fun Context.livePermissionsStatus(): PermissionsState =
         handlePermissionCheck(checkPermissions(applicationContext, mandatoryPermissions))
