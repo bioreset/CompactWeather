@@ -6,7 +6,7 @@ object Constants {
 
     //API SETUP
     const val API_URL = "https://dataservice.accuweather.com/"
-    const val API_KEY = ""
+    const val API_KEY = "" //obtain your own API key for free at https://developer.accuweather.com
 
     //DB SETUP
     const val DB_NAME = "compact_weather_db"
@@ -17,7 +17,6 @@ object Constants {
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_WIFI_STATE,
         Manifest.permission.CHANGE_WIFI_STATE,
-        Manifest.permission.READ_PHONE_STATE,
         Manifest.permission.ACCESS_NETWORK_STATE,
         Manifest.permission.INTERNET
     )

@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.dariusz.compactweather.domain.model.SavedCity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavedCityDao {
@@ -19,6 +20,6 @@ interface SavedCityDao {
     suspend fun checkIfCityAlreadyExists(providedCityID: Int): Int
 
     @Query("SELECT * FROM savedcities;")
-    suspend fun getAllSavedCities(): List<SavedCity>
+    fun getAllSavedCities(): Flow<List<SavedCity>>
 
 }

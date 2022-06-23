@@ -4,27 +4,21 @@ import com.dariusz.compactweather.data.local.db.dao.HourlyForecastDao
 import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiService
 import com.dariusz.compactweather.domain.model.HourlyForecast
 import com.dariusz.compactweather.domain.model.HourlyForecast.Companion.hourlyForecastsToDB
-import com.dariusz.compactweather.utils.NetworkBoundResource.networkBoundResource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-interface HourlyForecastRepository {
-
-    suspend fun getFinalTwelveHourForecast(key: String): List<HourlyForecast>
-
-}
-
-class HourlyForecastRepositoryImpl
+@Singleton
+class HourlyForecastRepository
 @Inject constructor(
     private val compactWeatherApiService: CompactWeatherApiService,
     private val hourlyForecastDao: HourlyForecastDao
-) : HourlyForecastRepository {
+) {
 
-    override suspend fun getFinalTwelveHourForecast(key: String): List<HourlyForecast> =
-        networkBoundResource(
-            dataFromNetwork = getTwelveHourForecast(key),
-            insertDataFromNetworkToDB = { insertTwelveFourHourForecast(hourlyForecastsToDB(it)) },
-            selectFetchedData = getTwelveFourHourForecastFromDB()
-        )
+    suspend fun getFinalTwelveHourForecast(key: String): Flow<List<HourlyForecast>> {
+        insertTwelveFourHourForecast(hourlyForecastsToDB(getTwelveHourForecast(key)))
+        return hourlyForecastDao.getAllHourlyForecasts()
+    }
 
     private suspend fun getTwelveHourForecast(key: String) =
         compactWeatherApiService.getTwelveHourForecast(key)
@@ -34,6 +28,4 @@ class HourlyForecastRepositoryImpl
         hourlyForecastDao.insertAll(inputData)
     }
 
-    private suspend fun getTwelveFourHourForecastFromDB() =
-        hourlyForecastDao.getAllHourlyForecasts()
 }

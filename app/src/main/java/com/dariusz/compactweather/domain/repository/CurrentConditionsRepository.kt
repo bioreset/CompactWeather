@@ -4,37 +4,28 @@ import com.dariusz.compactweather.data.local.db.dao.CurrentConditionsDao
 import com.dariusz.compactweather.data.source.remote.api.CompactWeatherApiService
 import com.dariusz.compactweather.domain.model.CurrentConditions
 import com.dariusz.compactweather.domain.model.CurrentConditions.Companion.currentConditionsToDB
-import com.dariusz.compactweather.utils.NetworkBoundResource.networkBoundResource
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import javax.inject.Singleton
 
-interface CurrentConditionsRepository {
-
-    suspend fun getCurrentConditionsData(key: String): List<CurrentConditions>
-
-}
-
-class CurrentConditionsRepositoryImpl
+@Singleton
+class CurrentConditionsRepository
 @Inject constructor(
     private val compactWeatherApiService: CompactWeatherApiService,
     private val currentConditionsDao: CurrentConditionsDao
-) : CurrentConditionsRepository {
+) {
 
-    override suspend fun getCurrentConditionsData(key: String): List<CurrentConditions> =
-        networkBoundResource(
-            dataFromNetwork = getCurrentWeather(key),
-            insertDataFromNetworkToDB = { insertCurrentConditions(currentConditionsToDB(it)) },
-            selectFetchedData = getCurrentWeatherFromDB()
-        )
+    suspend fun getCurrentConditionsData(key: String): Flow<CurrentConditions> {
+        insertCurrentConditions(currentConditionsToDB(getCurrentWeather(key)[0]))
+        return currentConditionsDao.getAllCurrentConditions()
+    }
 
     private suspend fun getCurrentWeather(key: String) =
         compactWeatherApiService.getCurrentWeather(key)
 
-    private suspend fun insertCurrentConditions(currentConditions: List<CurrentConditions>) {
+    private suspend fun insertCurrentConditions(currentConditions: CurrentConditions) {
         currentConditionsDao.deleteAllCurrentConditions()
-        currentConditionsDao.insertAll(currentConditions)
+        currentConditionsDao.insert(currentConditions)
     }
-
-    private suspend fun getCurrentWeatherFromDB() =
-        currentConditionsDao.getAllCurrentConditions()
 
 }

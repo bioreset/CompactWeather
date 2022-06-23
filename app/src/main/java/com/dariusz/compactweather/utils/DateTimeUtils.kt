@@ -5,10 +5,22 @@ import java.time.format.DateTimeFormatter
 
 object DateTimeUtils {
 
-    fun parseDate(date: String): String {
-        val dateToParse = LocalDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+    fun String.fullDate(): String {
+        val dateToParse = LocalDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME)
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
-        return formatter.format(dateToParse)
+        return formatter.format(dateToParse) ?: ""
+    }
+
+    fun String.shortDate(): String {
+        val dateToParse = LocalDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME)
+        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+        return formatter.format(dateToParse) ?: ""
+    }
+
+    fun String.shortTime(): String {
+        val dateToParse = LocalDateTime.parse(this, DateTimeFormatter.ISO_DATE_TIME)
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+        return formatter.format(dateToParse) ?: ""
     }
 
 }

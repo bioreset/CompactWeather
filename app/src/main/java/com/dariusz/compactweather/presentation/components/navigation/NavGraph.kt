@@ -8,9 +8,7 @@ import androidx.navigation.compose.composable
 import com.dariusz.compactweather.presentation.screens.dailyforecast.DailyForecastScreen
 import com.dariusz.compactweather.presentation.screens.home.HomeScreen
 import com.dariusz.compactweather.presentation.screens.hourlyforecast.HourlyForecastScreen
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
 @Composable
 fun MainNavigationHost(
     navController: NavController
@@ -34,5 +32,3 @@ fun MainNavigationHost(
         }
     }
 }
-
-

@@ -1,31 +1,42 @@
 package com.dariusz.compactweather.presentation.screens.dailyforecast
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.snapshots.Snapshot.Companion.withMutableSnapshot
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.dariusz.compactweather.domain.model.DailyForecast
-import com.dariusz.compactweather.domain.model.DataState
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.dariusz.compactweather.domain.repository.DailyForecastRepository
-import com.dariusz.compactweather.utils.ViewModelUtils.launchVMTask
-import com.dariusz.compactweather.utils.ViewModelUtils.manageResult
+import com.dariusz.compactweather.utils.ResultUtils.asResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
 @HiltViewModel
 class DailyForecastViewModel
 @Inject
 constructor(
-    private val dailyForecastRepository: DailyForecastRepository
+    private val dailyForecastRepository: DailyForecastRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _dailyForecast = MutableStateFlow<DataState<List<DailyForecast>>>(DataState.Idle)
-    val dailyForecast: StateFlow<DataState<List<DailyForecast>>> = _dailyForecast
+    @OptIn(SavedStateHandleSaveableApi::class)
+    private var cityId by savedStateHandle.saveable {
+        mutableStateOf("")
+    }
 
-    fun fetchDailyForecast(cityID: String) = launchVMTask {
-        manageResult(
-            _dailyForecast,
-            dailyForecastRepository.getFinalFiveDayForecast(cityID)
-        )
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val dailyForecast = snapshotFlow { cityId }
+        .flatMapLatest { dailyForecastRepository.getFinalFiveDayForecast(it) }
+        .asResult(viewModelScope)
+
+    fun fetchDailyForecast(cityID: String) {
+        withMutableSnapshot {
+            cityId = cityID
+        }
     }
 
 }

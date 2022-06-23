@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.dariusz.compactweather.domain.model.HourlyForecast
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HourlyForecastDao {
@@ -16,6 +17,6 @@ interface HourlyForecastDao {
     suspend fun deleteAllHourlyForecasts()
 
     @Query("SELECT * FROM hourlyforecast;")
-    suspend fun getAllHourlyForecasts(): List<HourlyForecast>
+    fun getAllHourlyForecasts(): Flow<List<HourlyForecast>>
 
 }

@@ -6,6 +6,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.dariusz.compactweather.domain.model.Day.Companion.dayToDB
 import com.dariusz.compactweather.domain.model.Night.Companion.nightToDB
+import com.dariusz.compactweather.utils.DateTimeUtils.shortTime
 
 @Entity(tableName = "dailyforecast")
 data class DailyForecast(
@@ -34,13 +35,12 @@ data class DailyForecast(
             return input.map { jsonInput ->
                 DailyForecast(
                     dateTime = jsonInput.dateTime,
-                    sun = jsonInput.sun.riseTime + " / " + jsonInput.sun.setTime,
-                    moon = jsonInput.moon.riseTime + " / " + jsonInput.moon.setTime + " / " + jsonInput.moon.phase,
-                    temperature =
-                    jsonInput.temperature.minimum.value.toString() + " " + jsonInput.temperature.minimum.unit
-                            + " - " + jsonInput.temperature.maximum.value + " " + jsonInput.temperature.maximum.unit,
-                    realFeelTemperature = jsonInput.realFeelTemperature.minimum.value.toString() + " " + jsonInput.realFeelTemperature.minimum.unit
-                            + " - " + jsonInput.realFeelTemperature.maximum.value + " " + jsonInput.realFeelTemperature.maximum.unit,
+                    sun = "from " + jsonInput.sun.riseTime.shortTime() + " to " + jsonInput.sun.setTime.shortTime(),
+                    moon = "from " + jsonInput.moon.riseTime.shortTime() + " to " + jsonInput.moon.setTime.shortTime(),
+                    temperature = "from " + jsonInput.temperature.minimum.value.toString() + " " + jsonInput.temperature.minimum.unit
+                            + " to " + jsonInput.temperature.maximum.value + " " + jsonInput.temperature.maximum.unit,
+                    realFeelTemperature = "from " + jsonInput.realFeelTemperature.minimum.value.toString() + " " + jsonInput.realFeelTemperature.minimum.unit
+                            + " to " + jsonInput.realFeelTemperature.maximum.value + " " + jsonInput.realFeelTemperature.maximum.unit,
                     hoursOfSun = jsonInput.hoursOfSun.toString(),
                     dayJson = dayToDB(jsonInput.dayJson),
                     nightJson = nightToDB(jsonInput.nightJson),
